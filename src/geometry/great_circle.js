@@ -1,18 +1,20 @@
 import { Vector3 } from "three";
-import { orthonomalBasis, Pole } from "../math/spherical";
+import { greatCircleArc, orthonomalBasis } from "../math/spherical";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { Line2 } from "three/addons/lines/Line2.js";
+import { clamp, radToDeg } from "three/src/math/MathUtils.js";
+import { debug } from "three/tsl";
 
 export class Equator {
   
-  constructor({ pole, color=0xff0000, radius=1, thickness=5, start=0, end=360 }) {
+  constructor({ pole, color=0xff0000, radius=1, thickness=5, start=0, end: length=360 }) {
     this.pole = pole;
     this.radius = radius;
     this.color = color;
     this.thickness = thickness;
     this.start = start;
-    this.end = end;
+    this.length = length;
 
     this.material = new LineMaterial();
     this.geometry = new LineGeometry();
@@ -21,7 +23,8 @@ export class Equator {
   }
 
   Update() {
-    this.geometry.setPositions(GeneratePoints(this.pole, this.radius, this.start, this.end));
+    const positions = GeneratePoints(this.pole, this.radius, this.start, this.length);
+    this.geometry.setPositions(positions);
     this.material.setValues({ color: this.color, linewidth: this.thickness });
   }
 }
@@ -41,17 +44,19 @@ export class Arc {
     this.material = new LineMaterial();
     this.geometry = new LineGeometry();
     this.mesh = new Line2(this.geometry, this.material);
+
     this.Update();
   }
   
   Update() {
-    const pole = Pole(this.point1, this.point2);
-    const [ u, v ] = orthonomalBasis(pole);
-    const angle1 = Math.acos(u.dot(this.point1)) * 180 / Math.PI;
-    const angle2 = Math.acos(u.dot(this.point2)) * 180 / Math.PI;
-    const target = this.length != 0 ? angle1 + this.length - this.start : this.end + angle2;
+    const angle = Math.acos(clamp(this.point1.dot(this.point2), -1, 1));
+    const length = this.length != 0 ? this.length : radToDeg(angle) + this.end - this.start;
+    const points = greatCircleArc(this.point1, this.point2, this.start, length, this.debug);
     
-    this.geometry.setPositions(GeneratePoints(pole, this.radius, this.start + angle1, target));
+    this.geometry.dispose()
+    this.geometry = new LineGeometry();
+    this.geometry.setFromPoints(points);
+    this.mesh.geometry = this.geometry;
     this.material.setValues({ color: this.color, linewidth: this.thickness });
   }
 }
@@ -75,3 +80,5 @@ function GeneratePoints(pole, radius, start, end) {
   return pts;
 
 }
+
+
