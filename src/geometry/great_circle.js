@@ -4,7 +4,6 @@ import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { Line2 } from "three/addons/lines/Line2.js";
 import { clamp, radToDeg } from "three/src/math/MathUtils.js";
-import { debug } from "three/tsl";
 
 export class Equator {
   
@@ -19,13 +18,19 @@ export class Equator {
     this.material = new LineMaterial();
     this.geometry = new LineGeometry();
     this.mesh = new Line2(this.geometry, this.material);
-    this.Update();
+    this.update();
   }
 
-  Update() {
+  update() {
     const positions = GeneratePoints(this.pole, this.radius, this.start, this.length);
     this.geometry.setPositions(positions);
     this.material.setValues({ color: this.color, linewidth: this.thickness });
+  }
+
+  dispose() {
+    this.geometry.dispose();
+    this.material.dispose();
+    this.mesh = null;
   }
 }
 
@@ -45,19 +50,25 @@ export class Arc {
     this.geometry = new LineGeometry();
     this.mesh = new Line2(this.geometry, this.material);
 
-    this.Update();
+    this.update();
   }
   
-  Update() {
+  update() {
     const angle = Math.acos(clamp(this.point1.dot(this.point2), -1, 1));
     const length = this.length != 0 ? this.length : radToDeg(angle) + this.end - this.start;
     const points = greatCircleArc(this.point1, this.point2, this.start, length, this.debug);
     
-    this.geometry.dispose()
+    this.geometry.dispose();
     this.geometry = new LineGeometry();
     this.geometry.setFromPoints(points);
     this.mesh.geometry = this.geometry;
     this.material.setValues({ color: this.color, linewidth: this.thickness });
+  }
+
+  dispose() {
+    this.geometry.dispose();
+    this.material.dispose();
+    this.mesh = null;
   }
 }
 

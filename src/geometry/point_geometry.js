@@ -13,7 +13,12 @@ export class PointGeom {
     this.mesh.scale.setScalar(scale);
   }
 
-  Update() {
+  update() {
     this.mesh.position.copy(this.point);
+  }
+
+  dispose() {
+    this.material.dispose();
+    this.mesh = null;
   }
 }
