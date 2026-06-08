@@ -4,12 +4,93 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Models from Reggie</title>
+    <title>Fundamenta Operationum Models</title>
     <style>
-      body { margin: 0; }
+      body {
+        max-width: 800px;
+        font-size: 1.3em;
+        margin: auto;
+        font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+      }
     </style>
   </head>
   <body>
-    <script type="module" src="/src/main.js"></script>
+    <h1>Models from Fundamenta Operationum by Regiomontanus</h1>
+    <p>
+      This page serves as an exploration of software for creating digital models of mathematical
+      diagrams for spherical trigonometry. 
+    </p>
+    <p>
+      In my opinion the gold standard example of similar 
+      models is this <a href="https://eater.net/quaternions/video/intro">quaternion visualization</a> 
+      by Ben Eater and 3Blue1Brown. It builds on MANIM to essentially make an interactive video,
+      explaining quaternions in a way that is both intuitive and beautiful. Unfortunately, they
+      never continued with similar projects and never made the code public so we don't have the code to work with.
+      The closer we can come to replicating this, the better.
+    </p>
+
+    <h2>Three.js</h2>
+    <p>
+      Three.js is a Javascript library for making 3D scenes. This provides the highest level of 
+      customizability but also requires the most work. However, with this it may be possible to 
+      make quite good interactive models.
+    </p>
+
+    <p>
+      Sample models I made for Proposition 2 and Proposition 14 can be found 
+      <a href="./threejs_models.html">here</a>.
+    </p>
+    
+    <h2>Desmos 3D</h2>
+    <p>
+      Desmos 3D is what I used for the models I made in class. While it worked well enough at the time
+      it probably isn't good enough for professional models. For one thing there is no option to hide
+      the clipping box which can look quite ugly. (It is possible to hide the box by starting from
+      <a href="https://www.desmos.com/3d/hidethebox">desmos.com/3d/hidethebox</a> but
+      this seems like a hack and I have no idea if it will continue to be supported). Other problems
+      include the lack of proper zooming and panning of the model, and that there is no way to get
+      rid of the expression list (at least that I know of while embedding it). That being said,
+      I was able to get a decent set of helper functions that allowed me to make complex models 
+      without too much time. However, I think maintaining a growing function library in the expression list
+      would become quite a chore. Also Desmos 3D has no way to add labels to points.
+    </p>
+
+    <p>
+      It is quite easy to embed a Desmos 3D graph in a webpage. However, this means we are reliant
+      on Desmos servers to keep the models up and running.
+    </p>
+
+    <p>A sample model for Proposition 2 is embedded below:</p>
+
+    <iframe src="https://www.desmos.com/3d/4h6gtjwd1c?embed" width="800", height="800", frameborder="0"></iframe>
+
+    <h2>Geogebra</h2>
+    
+    <p>
+      Geogebra seems better than Desmos 3D in that it is not subject to some of the restrictions such
+      as bad movement, the clipping box, and lack of labels. However, like Desmos the algebra list might be quite hard
+      to maintain. I found it quite a challenge to work out how to properly implement some of the arcs
+      for the models as it works quite differently from Desmos for defining geometry. This means that
+      much less can be shared between each model compared to Desmos making it take longer. 
+    </p>
+
+    <p>A sample model for Proposition 2 is embedded below:</p>
+
+    <iframe src="https://www.geogebra.org/calculator/r98fdtvx?embed" width="800" height="600" allowfullscreen style="border: 1px solid #e4e4e4;border-radius: 4px;" frameborder="0"></iframe>
+
+    <h2>Others</h2>
+    <p>
+      MANIM is a python library for creating mathematical animations and can make really great ones.
+      However, as far as I can work out there is no way to turn it into an interactive model.
+    </p>
+
+    <p>
+      JSX Graph is another web-based approach similar to THREE.js but may provide more of a starting base.
+      I only just discovered this and haven't had time to test, but could end up being between 
+      Desmos and THREE.js with the ease of use of Desmos but freedom of THREE.js.
+
+      An example of what can be done with JSX Graph is the following 
+      <a href="https://jsxgraph.uni-bayreuth.de/share/example/3d-parametric-surface-klein-bottle">Klein Bottle</a>.
+    </p>
   </body>
 </html>

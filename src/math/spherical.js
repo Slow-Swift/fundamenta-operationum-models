@@ -1,7 +1,7 @@
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 
-export function Point(lat, lon) {
+export function Point(lat=0, lon=0) {
   lat = lat * Math.PI / 180;
   lon = lon * Math.PI / 180;
 

@@ -19,6 +19,11 @@ export class PointGeom {
 
   dispose() {
     this.material.dispose();
+
+    while(this.mesh.children.length > 0) {
+      this.mesh.remove(this.mesh.children[0]);
+    }
+
     this.mesh = null;
   }
 }
