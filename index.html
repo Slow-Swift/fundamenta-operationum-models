@@ -20,6 +20,7 @@
       This page serves as an exploration of software for creating digital models of mathematical
       diagrams for spherical trigonometry. 
     </p>
+    <a href="./jsx_models.html">JSX Test</a>
     <p>
       In my opinion the gold standard example of similar 
       models is this <a href="https://eater.net/quaternions/video/intro">quaternion visualization</a> 
@@ -31,8 +32,9 @@
 
     <h2>Three.js</h2>
     <p>
-      Three.js is a Javascript library for making 3D scenes. This provides the highest level of 
-      customizability but also requires the most work. However, with this it may be possible to 
+      <a href="https://threejs.org/">Three.js</a> is a Javascript library for making 3D scenes. This provides the highest level of 
+      customizability but also requires the most work. I have to make all the functions to draw
+      the spherical diagrams, such as drawing an arc between two points. However, with this it may be possible to 
       make quite good interactive models.
     </p>
 
@@ -40,6 +42,19 @@
       Sample models I made for Proposition 2 and Proposition 14 can be found 
       <a href="./threejs_models.html">here</a>.
     </p>
+
+    <h2>JSXGraph</h2>
+
+    <a href="https://jsxgraph.org/">JSXGraph</a> is another Javascript library, but geared towards
+    drawing Mathematical diagrams. It is really excellent for 2D diagrams but also supports 3D diagrams.
+    I initially thought this might be really good, and it certainly is a decent option, however the 3D
+    support lacks some features I need such as drawing an arc between two points. I can add that functionality
+    but it is a bit more work and the library isn't as easy to extend as I initially thought. That being said
+    here is a example model for Proposition 2:
+
+    <div id="jxgbox" class="jxgbox" style="width: 500px; height: 500px;"></div>
+    <script type='module' src="src/jsxtest.js" charset="utf-8"></script>
+ 
     
     <h2>Desmos 3D</h2>
     <p>
@@ -82,15 +97,6 @@
     <p>
       MANIM is a python library for creating mathematical animations and can make really great ones.
       However, as far as I can work out there is no way to turn it into an interactive model.
-    </p>
-
-    <p>
-      JSX Graph is another web-based approach similar to THREE.js but may provide more of a starting base.
-      I only just discovered this and haven't had time to test, but could end up being between 
-      Desmos and THREE.js with the ease of use of Desmos but freedom of THREE.js.
-
-      An example of what can be done with JSX Graph is the following 
-      <a href="https://jsxgraph.uni-bayreuth.de/share/example/3d-parametric-surface-klein-bottle">Klein Bottle</a>.
     </p>
   </body>
 </html>
