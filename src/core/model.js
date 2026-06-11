@@ -43,7 +43,7 @@ export class Model {
 
   createPointGeometries(points) {
     for (const point in points) {
-      const pointGeom = new PointGeom(points[point]);
+      const pointGeom = new PointGeom(points[point], {color: 0x967e62, darkColor: 0x81694d });
       this.geometry[point] = pointGeom;
       pointGeom.mesh.add(new Label(point, new THREE.Vector3(0, 2, 0)).mesh);
     }

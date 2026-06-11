@@ -1,10 +1,11 @@
-import * as THREE from "three";
 import { distanceAlongArc, Point } from "../math/spherical";
-import { PointGeom } from "../geometry/point_geometry";
-import { Arc, Equator } from "../geometry/great_circle";
+import { Equator } from "../geometry/great_circle";
 import { Label } from "../geometry/label";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { Model } from "../core/model";
+import { Arc } from "../geometry/arc";
+import { SphereElement } from "../geometry/sphere_element";
+import { Vector3 } from "three";
 
 export class Proposition2 extends Model {
 
@@ -33,13 +34,11 @@ export class Proposition2 extends Model {
 
 
     this.geometry = {
-      equator: new Equator({ pole: p.F, color: 0x00ff00 }), 
-      ecliptic: new Arc({ point1: p.E, point2: p.B, color: 0x0000ff, length: 360 }),
-      horizon: new Arc({ point1: p.F, point2: p.A, length: 360 }),
-      FG: new Arc({ point1: p.F, point2: p.G, color: 0xffff00 }),
-      declination: new Arc({ point1: p.G, point2: p.H, color: 0xff8800, thickness: 8 }),
-      g_angle: new Arc({point1: p.E, point2: p.G, color: 0xff8800, thickness: 8 }),
-      right_ascension: new Arc({point1: p.E, point2: p.H, color: 0xff8800, thickness: 8 }),
+      sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
+      equator: new Equator(p.F), 
+      ecliptic: new Arc(p.E, p.B, { length: 360 }),
+      horizon: new Arc(p.F, p.A, { length: 360 }),
+      FG: new Arc(p.F, p.G), 
 
       declinationLabel: new Label('0', Point()),
     };
@@ -53,7 +52,7 @@ export class Proposition2 extends Model {
     this.points.G.copy(distanceAlongArc(this.points.E, this.points.B, this.parameters.g_angle));
     this.points.H.copy(distanceAlongArc(this.points.F, this.points.G, 90));
 
-    this.geometry.FG.point2 = this.parameters.g_angle > 180 ? this.points.H : this.points.G;
+    this.geometry.FG.point2 = this.parameters.g_angle < 180 ? this.points.H : this.points.G;
 
     const declination = Math.asin(Math.sin(degToRad(this.parameters.obliquity)) * Math.sin(degToRad(this.parameters.g_angle)));
     const decLabelPos = distanceAlongArc(this.points.G, this.points.H, radToDeg(Math.abs(declination)) / 2);

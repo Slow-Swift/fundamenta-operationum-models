@@ -1,11 +1,11 @@
-import * as THREE from "three";
 import { distanceAlongArc, Point } from "../math/spherical";
-import { PointGeom } from "../geometry/point_geometry";
-import { Arc, Equator } from "../geometry/great_circle";
-import GUI from "lil-gui";
+import { Equator } from "../geometry/great_circle";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { Model } from "../core/model";
 import { Label } from "../geometry/label";
+import { Arc } from "../geometry/arc";
+import { SphereElement } from "../geometry/sphere_element";
+import { Vector3 } from "three";
 
 export class Proposition14 extends Model {
 
@@ -33,14 +33,12 @@ export class Proposition14 extends Model {
     }
 
     this.geometry = {
-      equator: new Equator({ pole: p.Z, color: 0x00ff00 }), 
-      horizon: new Equator({ pole: p.H, color: 0x0000ff }),
-      edge: new Equator({ pole: p.E }),
-      HO: new Arc({ point1: p.H, point2: p.O, color:0xffff00 }),
-      declination: new Arc({ point1: p.O, point2: p.M, color: 0xff8800, thickness: 8}),
-      ZO: new Arc({ point1: p.Z, point2: p.O, color: 0xaa00ff }),
-      altitude: new Arc({ point1: p.O, point2: p.E, color: 0xff8800, thickness: 8}),
-      equatorLength: new Arc({ point1: p.M, point2: p.E, color: 0xff8800, thickness: 8}),
+      sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
+      equator: new Equator(p.Z), 
+      horizon: new Equator(p.H), 
+      edge: new Equator(p.E),
+      HO: new Arc(p.H, p.E),
+      ZO: new Arc(p.Z, p.M),
       
       altitudeLabel: new Label('0', Point()),
     };
