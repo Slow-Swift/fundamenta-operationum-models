@@ -1,5 +1,6 @@
 import { Vector3 } from "three";
-import { degToRad } from "three/src/math/MathUtils.js";
+import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
+import { dot } from "three/src/nodes/TSL.js";
 
 export function Point(lat=0, lon=0) {
   lat = lat * Math.PI / 180;
@@ -48,10 +49,6 @@ export function distanceAlongArc(a, b, distance) {
   return greatCircleArc(a, b, distance, 0)[0];
 }
 
-export function equatorArc(pole, start=0, length=360) {
-
-}
-
 export function greatCircleArc(a, b, start=0, length=360) {
   const u = a.clone().normalize();
   const n = a.clone().cross(b).normalize();
@@ -59,9 +56,41 @@ export function greatCircleArc(a, b, start=0, length=360) {
   return orthonormalArc(u, v, start, length);
 }
 
+export function latitudeArc(pole, latitude, start=0, length=360) {
+  const [u, v] = orthonomalBasis(pole);
+  const centre = pole.clone().multiplyScalar(Math.sin(degToRad(latitude)));
+  const radius = Math.cos(degToRad(latitude));
+  const points = orthonormalArc(u, v, start, length);
+  points.map(p => p.multiplyScalar(radius).add(centre));
+  return points;
+}
+
+export function smallCircleArc(pole, a, b, start=0, end=0) {
+  const latitude = Math.PI/2 - Math.acos(pole.dot(a));
+  const [u,v] = orthonomalBasis(pole);
+  const centre = pole.clone().multiplyScalar(Math.sin(latitude));
+
+  a = a.clone().sub(centre);
+  b = b.clone().sub(centre);
+
+  const alpha = mod(radToDeg(Math.atan2(
+    a.dot(v),
+    a.dot(u)
+  )), 360);
+
+  const beta = mod(radToDeg(Math.atan2(
+    b.dot(v),
+    b.dot(u)
+  )), 360);
+
+  const length = beta - alpha + end;
+  console.log(alpha, beta);
+  return latitudeArc(pole, radToDeg(latitude), alpha, length);
+}
+
 function orthonormalArc(u, v, start, length) {
   if (length < 0) { 
-    start = start - length;
+    start = start + length;
     length = -length;
   }
 
@@ -80,4 +109,9 @@ function orthonormalArc(u, v, start, length) {
   points.push(new Vector3().addScaledVector(u, Math.cos(theta)).addScaledVector(v, Math.sin(theta)));
 
   return points;
+}
+
+function mod(a,b) {
+  const out = a % b;
+  return out < 0 ? b + out : out;
 }

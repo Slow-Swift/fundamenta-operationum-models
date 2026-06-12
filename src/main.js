@@ -3,14 +3,18 @@ import { CSS2DRenderer, OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Proposition2 } from './models/proposition2';
 import { Proposition14 } from './models/proposition14';
 import GUI from 'lil-gui';
+import { Proposition7 } from './models/proposition7';
+import { Proposition9 } from './models/proposition9';
 
 const settings = window.settings = {
   darkMode: true,
-  model: Proposition2,
+  model: Proposition9,
 };
 
 const models = {
   'Proposition 2': Proposition2,
+  'Proposition 7': Proposition7,
+  'Proposition 9': Proposition9,
   'Proposition 14': Proposition14,
 };
 
@@ -43,7 +47,7 @@ function setModel(modelClass) {
   model.setup(parameterGui);
 }
 
-setModel(Proposition2);
+setModel(Proposition9);
 
 const perspective_camera = new THREE.PerspectiveCamera(
   75,
