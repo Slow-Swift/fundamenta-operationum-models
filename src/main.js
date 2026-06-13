@@ -5,10 +5,12 @@ import { Proposition14 } from './models/proposition14';
 import GUI from 'lil-gui';
 import { Proposition7 } from './models/proposition7';
 import { Proposition9 } from './models/proposition9';
+import { Proposition34 } from './models/proposition34';
+import { ModelGui } from './core/gui';
 
 const settings = window.settings = {
   darkMode: true,
-  model: Proposition9,
+  model: Proposition34,
 };
 
 const models = {
@@ -16,6 +18,7 @@ const models = {
   'Proposition 7': Proposition7,
   'Proposition 9': Proposition9,
   'Proposition 14': Proposition14,
+  'Proposition 34': Proposition34,
 };
 
 let model = undefined;
@@ -47,7 +50,9 @@ function setModel(modelClass) {
   model.setup(parameterGui);
 }
 
-setModel(Proposition9);
+setModel(Proposition34);
+
+const newGui = new ModelGui();
 
 const perspective_camera = new THREE.PerspectiveCamera(
   75,
@@ -90,6 +95,8 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 })
+
+// document.body.appendChild(newGui.domElement);
 
 function animate(time) {
   controls.update();

@@ -13,6 +13,22 @@ export function Point(lat=0, lon=0) {
   )
 }
 
+export function pointFromPole(pole, lonZero, lat, lon) {
+  const [u,v] = orthonomalBasis(pole);
+  const centre = pole.clone().multiplyScalar(Math.sin(degToRad(lat)));
+
+  const a = lonZero.clone().sub(centre);
+
+  const alpha = mod(radToDeg(Math.atan2(
+    a.dot(v),
+    a.dot(u)
+  )), 360);
+
+  const newLon = lon + alpha;
+  return latitudeArc(pole, lat, newLon, 0)[0];
+
+}
+
 export function UpdatePoint(point, lat, lon) {
   point.x = Math.sin(lat) * Math.cos(lon);
   point.y = Math.sin(lon);
@@ -54,6 +70,10 @@ export function greatCircleArc(a, b, start=0, length=360) {
   const n = a.clone().cross(b).normalize();
   const v = n.clone().cross(u).normalize();
   return orthonormalArc(u, v, start, length);
+}
+
+export function distanceAlongLatitude(pole, latitude, distance) {
+  return latitudeArc(pole, latitude, distance, 0)[0];
 }
 
 export function latitudeArc(pole, latitude, start=0, length=360) {
