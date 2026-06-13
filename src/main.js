@@ -10,7 +10,7 @@ import { ModelGui } from './core/gui';
 
 const settings = window.settings = {
   darkMode: true,
-  model: Proposition34,
+  model: Proposition2,
 };
 
 const models = {
@@ -50,7 +50,7 @@ function setModel(modelClass) {
   model.setup(parameterGui);
 }
 
-setModel(Proposition34);
+setModel(Proposition2);
 
 const newGui = new ModelGui();
 
