@@ -8,6 +8,7 @@ import { Proposition9 } from './models/proposition9';
 import { Proposition34 } from './models/proposition34';
 import { ModelGui } from './core/gui';
 import { Proposition2Animated } from './models/proposition2-animated';
+import 'katex/dist/katex.min.css';
 
 const settings = window.settings = {
   darkMode: true,
@@ -16,7 +17,7 @@ const settings = window.settings = {
 
 const models = {
   'Proposition 2': Proposition2,
-  'Animation Test': Proposition2Animated, 
+  'Proposition 2 Breakdown': Proposition2Animated, 
   'Proposition 7': Proposition7,
   'Proposition 9': Proposition9,
   'Proposition 14': Proposition14,
@@ -48,6 +49,8 @@ function setModel(modelClass) {
   while (parameterGui.children.length > 0) {
     parameterGui.children[0].destroy();
   }
+
+  newGui.clear();
 
   model = new modelClass();
   model.setup(parameterGui, newGui);
@@ -102,6 +105,7 @@ document.body.appendChild(newGui.domElement);
 
 function animate(time) {
   controls.update();
+  model.updatePointSize(orthographic_camera.zoom);
   renderer.render(model.scene, orthographic_camera);
   labelRenderer.render(model.scene, orthographic_camera);
   if (!model.lazy) model.update();

@@ -1,8 +1,9 @@
 import { CSS2DObject } from "three/examples/jsm/Addons.js";
+import katex from "katex";
 
 export class Label {
 
-  constructor(text, position, { visible=true }={}) {
+  constructor(text='', position=[0,0,0], { visible=true }={}) {
     this.text = text;
     this.position = position;
     this.div = document.createElement('div');
@@ -20,7 +21,8 @@ export class Label {
   }
 
   update() {
-    this.div.textContent = this.text;
+    katex.render(this.text.toString(), this.div, { displayMode: false });
+    // this.div.textContent = this.text;
     this.mesh.position.copy(this.position);
   }
 

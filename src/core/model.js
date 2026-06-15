@@ -22,6 +22,8 @@ export class Model {
 
     this.setupGui(gui, newGui);
     if (this.lazy) { gui.onChange(e => this.update()) }
+    
+    this.setState(1);
   }
 
   update() {
@@ -31,6 +33,8 @@ export class Model {
       this.geometry[geometry].update();
     }
   }
+
+  setState() {}
 
   dispose() {
     for (const geometry in this.geometry) {
@@ -43,9 +47,11 @@ export class Model {
   }
 
   createPointGeometries(points, hidden=[]) {
+    this.pointGeometries = {};
     for (const point in points) {
       const pointGeom = new PointGeom(points[point], {color: 0x967e62, darkColor: 0x81694d, visible: !hidden.includes(points[point])});
       this.geometry[point] = pointGeom;
+      this.pointGeometries[point] = pointGeom;
       pointGeom.mesh.add(new Label(point, new THREE.Vector3(0, 0, 0)).mesh);
     }
   }
@@ -53,6 +59,12 @@ export class Model {
   setGeometryVisibility(visible, geometry) {
     for (const geom of geometry) {
       geom.setVisible(visible);
+    }
+  }
+
+  updatePointSize(zoom) {
+    for (const point in this.pointGeometries) {
+      this.pointGeometries[point].setScale(1/zoom); 
     }
   }
 
