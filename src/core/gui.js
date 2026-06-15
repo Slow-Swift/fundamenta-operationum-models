@@ -2,24 +2,29 @@ export class ModelGui {
 
   constructor() {
     this.initializeDomElement();
-    this.addArrows();
   }
 
   initializeDomElement() {
     this.domElement = document.createElement('div');
-    this.domElement.style.width = '100%';
-    this.domElement.style.height = '100%';
-    this.domElement.style.top = '0px';
-    this.domElement.style.overflow = 'hidden';
-    this.domElement.style.position = 'absolute';
-    this.domElement.style.pointerEvents = 'none';
-  }
+    this.domElement.classList.add('model-gui');
+ }
 
-  addArrows() {
+  addArrows(leftCallback, rightCallback) {
     this.arrows = document.createElement('div');
-    this.arrows.innerHTML = "<p>Test</p>";
-    this.arrows.style.background = 'white';
-    this.arrows.style.position = 'absolute';
+    this.arrows.classList.add('arrows-container')
+
+    this.leftArrow = document.createElement('div');
+    this.leftArrow.classList.add('arrow');
+    this.leftArrow.innerHTML = '&#x2190;';
+    this.leftArrow.onclick = leftCallback;
+    this.arrows.appendChild(this.leftArrow);
+
+    this.rightArrow = document.createElement('div');
+    this.rightArrow.classList.add('arrow');
+    this.rightArrow.innerHTML = '&#x2192;'
+    this.rightArrow.onclick = rightCallback;
+    this.arrows.appendChild(this.rightArrow);
+
     this.domElement.appendChild(this.arrows);
   }
 

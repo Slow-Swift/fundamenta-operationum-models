@@ -2,7 +2,7 @@ import { Vector3 } from "three";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { dot } from "three/src/nodes/TSL.js";
 
-export function Point(lat=0, lon=0) {
+export function Point(lat=0, lon=0, visible=true) {
   lat = lat * Math.PI / 180;
   lon = lon * Math.PI / 180;
 
@@ -10,7 +10,7 @@ export function Point(lat=0, lon=0) {
     Math.sin(lat) * Math.cos(lon),
     Math.sin(lon),
     Math.cos(lat) * Math.cos(lon),
-  )
+  );
 }
 
 export function pointFromPole(pole, lonZero, lat, lon) {

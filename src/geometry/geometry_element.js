@@ -1,9 +1,17 @@
 export class ModelElement {
 
-  constructor({ color=0x7b6148, darkColor=0xad946f }={}) {
+  constructor({ color=0x7b6148, darkColor=0xad946f, visible=true }={}) {
     this.lightColor = color;
     this.color = this.lightColor;
     this.darkColor = darkColor;
+    this.visible = visible; 
+  }
+
+  setVisible(visible) {
+    this.visible = visible;
+    if (this.mesh) {
+      this.mesh.visible = visible;
+    }
   }
 
   update() {

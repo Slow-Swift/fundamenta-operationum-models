@@ -12,6 +12,7 @@ export class SphereElement extends ModelElement {
     this.material = new THREE.MeshBasicMaterial({ color: this.color });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.copy(this.point);
+    this.mesh.visible = this.visible;
   }
 
   update() {

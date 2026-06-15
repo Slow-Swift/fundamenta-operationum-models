@@ -10,6 +10,7 @@ export class LineElement extends ModelElement {
     this.material = new LineMaterial();
     this.geometry = new LineGeometry();
     this.mesh = new Line2(this.geometry, this.material);
+    this.mesh.visible = this.visible;
   }
   
   update() {

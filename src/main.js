@@ -7,14 +7,16 @@ import { Proposition7 } from './models/proposition7';
 import { Proposition9 } from './models/proposition9';
 import { Proposition34 } from './models/proposition34';
 import { ModelGui } from './core/gui';
+import { Proposition2Animated } from './models/proposition2-animated';
 
 const settings = window.settings = {
   darkMode: true,
-  model: Proposition2,
+  model: Proposition2Animated,
 };
 
 const models = {
   'Proposition 2': Proposition2,
+  'Animation Test': Proposition2Animated, 
   'Proposition 7': Proposition7,
   'Proposition 9': Proposition9,
   'Proposition 14': Proposition14,
@@ -23,6 +25,7 @@ const models = {
 
 let model = undefined;
 
+const newGui = new ModelGui();
 const masterGui = new GUI();
 masterGui.add(settings, 'model', models).onChange(model => setModel(model));
 const parameterGui = masterGui.addFolder('Model Parameters');
@@ -47,12 +50,11 @@ function setModel(modelClass) {
   }
 
   model = new modelClass();
-  model.setup(parameterGui);
+  model.setup(parameterGui, newGui);
 }
 
-setModel(Proposition2);
+setModel(Proposition2Animated);
 
-const newGui = new ModelGui();
 
 const perspective_camera = new THREE.PerspectiveCamera(
   75,
@@ -96,7 +98,7 @@ window.addEventListener('resize', () => {
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 })
 
-// document.body.appendChild(newGui.domElement);
+document.body.appendChild(newGui.domElement);
 
 function animate(time) {
   controls.update();

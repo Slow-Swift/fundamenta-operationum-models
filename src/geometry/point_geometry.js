@@ -13,6 +13,7 @@ export class PointGeom extends ModelElement {
     this.mesh = new THREE.Mesh(PointGeom.POINT_GEOMETRY, this.material);
     this.mesh.position.copy(this.point);
     this.mesh.scale.setScalar(scale);
+    this.mesh.visible = this.visible;
   }
 
   update() {
