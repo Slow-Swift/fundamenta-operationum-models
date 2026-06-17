@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { PointGeom } from "../geometry/point_geometry";
 import { Label } from "../geometry/label";
 import { warn } from "jsxgraph";
+import { array } from "three/tsl";
 
 export class Model {
 
@@ -9,10 +10,11 @@ export class Model {
     this.scene = new THREE.Scene();
     this.points = {};
     this.geometry = {};
+    this.animations = [];
     this.lazy = true;
   }
 
-  setup(gui, newGui) { 
+  setup(gui) { 
     this.createModel();
     this.update();
 
@@ -20,17 +22,39 @@ export class Model {
       this.scene.add(this.geometry[geometry].mesh);
     }
 
-    this.setupGui(gui, newGui);
-    if (this.lazy) { gui.onChange(e => this.update()) }
+    this.setupGui(gui);
+    if (this.lazy) { gui.onSliderChanged = () => this.update() }
     
     this.setState(1);
   }
 
-  update() {
+  update(time) {
     this.updateCalculations();
        
     for (const geometry in this.geometry) {
-      this.geometry[geometry].update();
+      this.geometry[geometry].update(time);
+    }
+  }
+
+  cancelAnimations() {
+    for (const animation of this.animations) {
+      animation.complete();
+    }
+    this.animations.length = 0;
+  }
+
+  updateAnimations(time) {
+    for (const animation of this.animations) {
+      animation.update(time);
+    }
+    this.animations = this.animations.filter(a => !a.completed);
+  }
+
+  addAnimation(animation) {
+    if (Array.isArray(animation)) {
+      this.animations.push(...animation);
+    } else {
+      this.animations.push(animation);
     }
   }
 

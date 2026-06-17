@@ -4,7 +4,7 @@ import { ModelElement } from './geometry_element';
 export class PointGeom extends ModelElement {
 
   static POINT_GEOMETRY = new THREE.SphereGeometry(1, 16, 16);
-  static POINT_SCALE = 0.05;
+  static POINT_SCALE = 0.035;
 
   constructor(point, { scale=1, distance=1, ...args} = {}) {
     super(args);

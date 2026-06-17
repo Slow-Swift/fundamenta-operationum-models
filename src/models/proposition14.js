@@ -6,6 +6,8 @@ import { Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
+import { RightAngle } from "../geometry/right_angle";
+import { AngleElement } from "../geometry/angle_element";
 
 export class Proposition14 extends Model {
 
@@ -41,17 +43,21 @@ export class Proposition14 extends Model {
       ZO: new Arc(p.Z, p.M),
       
       altitudeLabel: new Label('0', Point()),
+
+      // Angles
+      angle_B: new RightAngle(p.B, p.A, p.E),
+      angle_A: new RightAngle(p.A, p.H, p.E),
+      angle_H: new RightAngle(p.H, Point(90, 45), p.E),
+      angle_M: new RightAngle(p.M, p.A, p.Z),
+      angle_E: new AngleElement(p.E, p.A, p.H),
     };
 
     this.createPointGeometries(p);
   }
 
-  setupGui(gui) {
-    gui.add(this.parameters, 'latitude', 0, 90);
-    gui.add(this.parameters, 'declination', 0, 90);
-  }
-
   updateCalculations() {
+    this.declinationSlider?.setRange(0, this.parameters.latitude);
+
     this.points.Z.copy(Point(90, this.parameters.latitude));
     this.points.A.copy(Point(-90, 90 - this.parameters.latitude ));
     this.points.D.copy(Point(90, -90 + this.parameters.latitude));
@@ -68,6 +74,11 @@ export class Proposition14 extends Model {
       this.geometry.altitudeLabel.text = "Undefined";
       this.geometry.altitudeLabel.position = Point(20, 45);
     }
+  }
+
+  setupGui(gui) {
+    gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
+    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', 0, 90);
   }
 
 }

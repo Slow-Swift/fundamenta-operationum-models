@@ -24,19 +24,27 @@ const models = {
   'Proposition 34': Proposition34,
 };
 
+settings.model = models[localStorage.getItem('Model', 'Proposition 2')];
+
 let model = undefined;
 
 const newGui = new ModelGui();
 const masterGui = new GUI();
-masterGui.add(settings, 'model', models).onChange(model => setModel(model));
-const parameterGui = masterGui.addFolder('Model Parameters');
+masterGui.add(settings, 'model', models).onChange(model => {
+  setModel(model);
+  for (const modelName in models) {
+    if (models[modelName] == model) {
+      localStorage.setItem('Model', modelName);
+      console.log("Selected", modelName);
+    }
+  }
+});
 const settingsGui = masterGui.addFolder('RenderingSettings');
 
 function updateRenderingSettings() {
   renderer.setClearColor(settings.darkMode ? 0x17131f : 0xfcfaf4);
   document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
   model?.update();
-
 }
 
 settingsGui.title('Rendering Settings');
@@ -45,18 +53,13 @@ settingsGui.add(settings, 'darkMode').onChange(updateRenderingSettings);
 function setModel(modelClass) {
   model?.dispose();
 
-  // Clear the parameter GUI
-  while (parameterGui.children.length > 0) {
-    parameterGui.children[0].destroy();
-  }
-
   newGui.clear();
 
   model = new modelClass();
-  model.setup(parameterGui, newGui);
+  model.setup(newGui);
 }
 
-setModel(Proposition2Animated);
+setModel(settings.model);
 
 
 const perspective_camera = new THREE.PerspectiveCamera(
@@ -106,6 +109,7 @@ document.body.appendChild(newGui.domElement);
 function animate(time) {
   controls.update();
   model.updatePointSize(orthographic_camera.zoom);
+  model.updateAnimations(time/1000);
   renderer.render(model.scene, orthographic_camera);
   labelRenderer.render(model.scene, orthographic_camera);
   if (!model.lazy) model.update();

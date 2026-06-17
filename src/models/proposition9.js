@@ -8,6 +8,9 @@ import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
 import { LatitudeCircle } from "../geometry/latitude_circle";
 import { SmallCircleArc } from "../geometry/small_circle_arc";
+import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
+import { RightAngle } from "../geometry/right_angle";
+import { AngleElement } from "../geometry/angle_element";
 
 export class Proposition9 extends Model {
 
@@ -47,25 +50,33 @@ export class Proposition9 extends Model {
       ortiveAmplitudeLabel: new Label('0', Point()),
       urnalLabel: new Label('0', Point()),
       latitude: new SmallCircleArc(p.H, p.L, p.Z),
+
+      // Angles
+      angle_B: new RightAngle(p.B, p.A, p.E),
+      angle_A: new RightAngle(p.A, Point(90, 45), p.E),
+      angle_K: new RightAngle(p.K, p.E, p.H),
+      angle_E: new AngleElement(p.E, p.B, p.K),
     };
 
     this.createPointGeometries(p);
   }
 
   updateCalculations() {
+    this.declinationSlider?.setRange(0, 90-this.parameters.latitude);
+
     this.points.Z.copy(Point(-90, -this.parameters.latitude));
     this.points.A.copy(Point(-90, 90-this.parameters.latitude));
     this.points.D.copy(Point(90, -90+this.parameters.latitude));
 
     this.points.L.copy(Point(-90, 90-this.parameters.latitude-this.parameters.declination));
 
-    const ortiveSin = Math.sin(degToRad(this.parameters.declination))/Math.sin(degToRad(90-this.parameters.latitude));
-    const ortiveAmplitude = radToDeg(Math.asin(ortiveSin));
+    const ortiveSin = sin(this.parameters.declination) / sin(90-this.parameters.latitude);
+    const ortiveAmplitude = asin(ortiveSin);
     this.points.H.copy(Point(-ortiveAmplitude, 0));
     this.points.K.copy(distanceAlongArc(this.points.Z, this.points.H, 90));
     this.geometry.latitude.latitude = this.parameters.declination;
 
-    const urnal = radToDeg(Math.asin(Math.sin(degToRad(90 - ortiveAmplitude))/Math.sin(degToRad(90-this.parameters.declination))));
+    const urnal = asin(sin(90-ortiveAmplitude)/sin(90-this.parameters.declination)); 
     
     if (!isNaN(ortiveAmplitude)) {
       this.geometry.ortiveAmplitudeLabel.text = Math.round(ortiveAmplitude*10)/10;
@@ -88,8 +99,8 @@ export class Proposition9 extends Model {
   }
 
   setupGui(gui) {
-    gui.add(this.parameters, 'latitude', 0, 90);
-    gui.add(this.parameters, 'declination', 0, 90);
+    gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
+    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', 0, 90);
   }
 
 }

@@ -1,6 +1,7 @@
 import { Vector3 } from "three";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
-import { dot } from "three/src/nodes/TSL.js";
+import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
+
 
 export function Point(lat=0, lon=0, visible=true) {
   lat = lat * Math.PI / 180;
@@ -76,22 +77,13 @@ export function distanceAlongLatitude(pole, latitude, distance) {
   return latitudeArc(pole, latitude, distance, 0)[0];
 }
 
-export function latitudeArc(pole, latitude, start=0, length=360) {
-  const [u, v] = orthonomalBasis(pole);
-  const centre = pole.clone().multiplyScalar(Math.sin(degToRad(latitude)));
-  const radius = Math.cos(degToRad(latitude));
-  const points = orthonormalArc(u, v, start, length);
-  points.map(p => p.multiplyScalar(radius).add(centre));
-  return points;
-}
-
-export function smallCircleArc(pole, a, b, start=0, end=0) {
-  const latitude = Math.PI/2 - Math.acos(pole.dot(a));
+export function distanceAlongSmallCircle(pole, a, b, distance, lat) {
+  const latitude = lat ? lat : 90 - acos(pole.dot(a));
   const [u,v] = orthonomalBasis(pole);
-  const centre = pole.clone().multiplyScalar(Math.sin(latitude));
 
-  a = a.clone().sub(centre);
-  b = b.clone().sub(centre);
+  // Project A and B down to the equator of pole
+  a = projectToEquator(a, pole);
+  b = projectToEquator(b, pole);
 
   const alpha = mod(radToDeg(Math.atan2(
     a.dot(v),
@@ -103,9 +95,47 @@ export function smallCircleArc(pole, a, b, start=0, end=0) {
     b.dot(u)
   )), 360);
 
-  const length = beta - alpha + end;
-  console.log(alpha, beta);
-  return latitudeArc(pole, radToDeg(latitude), alpha, length);
+  if (beta < alpha) distance = -distance;
+
+  return latitudeArc(pole, latitude, alpha+distance, 0)[0];
+}
+
+export function latitudeArc(pole, latitude, start=0, length=360) {
+  const [u, v] = orthonomalBasis(pole);
+  const centre = pole.clone().multiplyScalar(Math.sin(degToRad(latitude)));
+  const radius = Math.cos(degToRad(latitude));
+  const points = orthonormalArc(u, v, start, length);
+  points.map(p => p.multiplyScalar(radius).add(centre));
+  return points;
+}
+
+export function smallCircleArc(pole, a, b, start=0, end=0, lat=undefined) {
+  const latitude = lat ? lat : 90 - acos(pole.dot(a));
+  const [u,v] = orthonomalBasis(pole);
+
+  // Project A and B down to the equator of pole
+  a = projectToEquator(a, pole);
+  b = projectToEquator(b, pole);
+
+  const alpha = mod(radToDeg(Math.atan2(
+    a.dot(v),
+    a.dot(u)
+  )), 360);
+
+  const beta = mod(radToDeg(Math.atan2(
+    b.dot(v),
+    b.dot(u)
+  )), 360);
+
+  const angle = mod(beta - alpha, 360);
+
+  if (angle <= 180) {
+    const length = angle - start + end;
+    return latitudeArc(pole, latitude, alpha+start, length);
+  } else {
+    const length = 360-angle - start + end;
+    return latitudeArc(pole, latitude, alpha-start, -length);
+  }
 }
 
 function orthonormalArc(u, v, start, length) {
@@ -129,6 +159,10 @@ function orthonormalArc(u, v, start, length) {
   points.push(new Vector3().addScaledVector(u, Math.cos(theta)).addScaledVector(v, Math.sin(theta)));
 
   return points;
+}
+
+export function projectToEquator(point, pole) {
+  return point.clone().sub(pole.clone().multiplyScalar(pole.dot(point))).normalize();
 }
 
 function mod(a,b) {

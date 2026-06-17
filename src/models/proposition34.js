@@ -65,6 +65,9 @@ export class Proposition34 extends Model {
   }
 
   updateCalculations() {
+    this.lat_x_slider?.setRange(0, 90-this.parameters.obliquity);
+    this.lat_t_slider?.setRange(this.parameters.latitude_1, 90-this.parameters.obliquity);
+
     const p = this.points;
     const g = this.geometry;
 
@@ -102,14 +105,18 @@ export class Proposition34 extends Model {
     const TX = acos(cos(TN) * cos(XN));
     const mNXT = asin(sin(TN)/sin(TX));
     p.S.copy(Point(-90+mNXT, cos(mNXT) * lat1_C));
-}
+  }
 
   setupGui(gui) {
-    gui.add(this.parameters, 'latitude_1', 0, 90);
-    gui.add(this.parameters, 'declination', 0, 90);
-    gui.add(this.parameters, 'obliquity', 0, 90);
-    gui.add(this.parameters, 'latitude_2', 0, 90);
-    gui.add(this.parameters, 'longitude', -45, 45);
+    this.lat_x_slider = gui.addSlider('Latitude X', this.parameters, 'latitude_1', 0, 90);
+    this.lat_t_slider = gui.addSlider('Latitude T', this.parameters, 'latitude_2', 0, 90);
+    this.lon_slider = gui.addSlider('Longitude', this.parameters, 'longitude', -180, 180);
+    this.obliquity_slider = gui.addSlider('Obliquity', this.parameters, 'obliquity', 0, 90);
+  //   gui.add(this.parameters, 'latitude_1', 0, 90);
+  //   gui.add(this.parameters, 'declination', 0, 90);
+  //   gui.add(this.parameters, 'obliquity', 0, 90);
+  //   gui.add(this.parameters, 'latitude_2', 0, 90);
+  //   gui.add(this.parameters, 'longitude', -45, 45);
   }
 
 }
