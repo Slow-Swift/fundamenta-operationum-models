@@ -178,6 +178,7 @@ export class Proposition2Animated extends Model {
         break;
       case 8:
         this.gui.clearTextLines();
+        this.setGeometryVisibility(true, [g.ecliptic, g.equator, g.FG]);
         this.addAnimation([
           Animation.AnimateGeometry(g.FG, 'start', 0.5, (p) => g.FG.angle() * (1-p), 0),
           Animation.AnimateGeometry(g.equator, 'length', 0.65, (p) => 360 * p, 360),
@@ -186,7 +187,6 @@ export class Proposition2Animated extends Model {
           Animation.AfterDelay(0.65, () => this.setGeometryVisibility(true, [g.B, g.D])),
           Animation.AfterDelay(0.9, () => this.setGeometryVisibility(true, [g.A, g.C])),
         ]);
-        this.setGeometryVisibility(true, [g.ecliptic, g.equator, g.FG]);
         break;
     }
   }
@@ -244,6 +244,7 @@ export class Proposition2Animated extends Model {
         this.gui.addTextLine("Solving for $\\sin{GH}$ gives: $$\\sin{GH} = \\sin{EG}\\cdot \\sin{\\angle E}$$");
         this.gui.addTextLine("Which is the sought declination");
         this.setGeometryVisibility(false, [g.F, g.B, g.D, g.A, g.C]);
+        this.setGeometryVisibility(true, [g.ecliptic, g.equator, g.FG]);
         this.addAnimation([
           Animation.AnimateGeometry(g.FG, 'start', 0.5, (p) => g.FG.angle() * p, 0),
           Animation.AnimateGeometry(g.equator, 'length', 0.65, (p) => 360 * (1-p), 360),
@@ -252,7 +253,6 @@ export class Proposition2Animated extends Model {
           Animation.AfterDelay(0.65, () => this.setGeometryVisibility(false, [g.equator])),
           Animation.AfterDelay(0.9, () => this.setGeometryVisibility(false, [g.ecliptic])),
         ]);
-        this.setGeometryVisibility(true, [g.ecliptic, g.equator, g.FG]);
         break;
     }
 

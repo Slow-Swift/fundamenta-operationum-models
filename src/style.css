@@ -45,8 +45,25 @@ body { margin: 0; }
   color: var(--line-color);
   height: 100%;
   font-weight: bold;
-  top: 25%;
+  top: 15%;
   right: 80px;
+}
+
+.page-controls {
+  position:absolute;
+  width: fit-content;
+  height: fit-content;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background-color: var(--background-highlight);
+  border-left: 2px solid var(--line-color);
+  border-right: 2px solid var(--line-color);
+  border-bottom: 2px solid var(--line-color);
+  border-radius: 0 0 10px 10px;
+  padding: 10px;
+  pointer-events: all;
 }
 
 .slidecontainer {

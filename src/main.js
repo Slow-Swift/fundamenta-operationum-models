@@ -24,31 +24,24 @@ const models = {
   'Proposition 34': Proposition34,
 };
 
-settings.model = models[localStorage.getItem('Model', 'Proposition 2')];
+settings.model = models[localStorage.getItem('Model') ?? 'Proposition 2'];
+settings.darkMode = localStorage.getItem('DarkMode') ?? false;
 
 let model = undefined;
 
 const newGui = new ModelGui();
-const masterGui = new GUI();
-masterGui.add(settings, 'model', models).onChange(model => {
-  setModel(model);
-  for (const modelName in models) {
-    if (models[modelName] == model) {
-      localStorage.setItem('Model', modelName);
-      console.log("Selected", modelName);
-    }
-  }
-});
-const settingsGui = masterGui.addFolder('RenderingSettings');
+newGui.setupPageControls(models, localStorage.getItem('Model') ?? 'Proposition 2', (model) => {
+  settings.model = model;
+  localStorage.setItem('Model', model);
+  setModel(models[model]);
+}, settings.darkMode, (dark) => {console.log(dark); settings.darkMode = dark; updateRenderingSettings()});
 
 function updateRenderingSettings() {
+  localStorage.setItem('DarkMode', settings.darkMode);
   renderer.setClearColor(settings.darkMode ? 0x17131f : 0xfcfaf4);
   document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
   model?.update();
 }
-
-settingsGui.title('Rendering Settings');
-settingsGui.add(settings, 'darkMode').onChange(updateRenderingSettings);
 
 function setModel(modelClass) {
   model?.dispose();
@@ -89,6 +82,7 @@ perspective_camera.position.z = 4;
 orthographic_camera.position.z = 4;
 
 const controls = new OrbitControls(orthographic_camera, renderer.domElement);
+controls.enablePan = false;
 
 window.addEventListener('resize', () => {
   const aspect = window.innerWidth / window.innerHeight;
@@ -108,6 +102,7 @@ document.body.appendChild(newGui.domElement);
 
 function animate(time) {
   controls.update();
+  controls.rotateSpeed = orthographic_camera.zoom > 1 ? 1/orthographic_camera.zoom : 1;
   model.updatePointSize(orthographic_camera.zoom);
   model.updateAnimations(time/1000);
   renderer.render(model.scene, orthographic_camera);

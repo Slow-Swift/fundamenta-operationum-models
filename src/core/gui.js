@@ -25,7 +25,32 @@ export class ModelGui {
     this.sliderArea.classList.add('gui-sliders');
     this.domElement.appendChild(this.sliderArea);
     this.sliders = [];
- }
+  }
+
+  setupPageControls(options, selected, onselected, darkTheme, onThemeChange) {
+    this.pageControls = document.createElement('div');
+    this.pageControls.classList.add('page-controls');
+    this.domElement.appendChild(this.pageControls);
+
+    this.modelDropdown = document.createElement('select');
+    this.pageControls.appendChild(this.modelDropdown);
+    this.modelDropdown.oninput = () => onselected(this.modelDropdown.value);
+
+    for (const option in options) {
+      const element = document.createElement('option');
+      this.modelDropdown.appendChild(element);
+      element.value = option;
+      element.innerText = option;
+    }
+
+    this.modelDropdown.value = selected;
+
+    this.darkToggle = document.createElement('input');
+    this.darkToggle.type = 'checkbox';
+    this.pageControls.appendChild(this.darkToggle);
+    this.darkToggle.checked = darkTheme;
+    this.darkToggle.oninput = () => onThemeChange(this.darkToggle.checked);
+  }
 
   clear() {
     this.arrows.innerHTML = '';

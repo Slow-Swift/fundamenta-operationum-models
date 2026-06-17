@@ -9,6 +9,8 @@ export class Animation {
     this.time = time;
     this.setVal = setVal;
     this.onComplete = onComplete;
+
+    this.setVal?.(this.start);
   }
 
   update(time) {
