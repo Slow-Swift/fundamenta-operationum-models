@@ -12,3 +12,8 @@ export function asinn(a) { return radToDeg(Math.asin(a)) };
 export function acosn(a) { return radToDeg(Math.acos(a)) };
 
 export function round(a, p) { return Math.round(a * (10 ** p)) / (10 ** p) }
+
+export function mod(a,b) {
+  const out = a % b;
+  return out < 0 ? b + out : out;
+}

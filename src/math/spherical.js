@@ -2,6 +2,8 @@ import { Vector3 } from "three";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
 
+window.Vector3 = Vector3;
+window.orthonomalizePoints = orthonomalizePoints;
 
 export function Point(lat=0, lon=0, visible=true) {
   lat = lat * Math.PI / 180;
@@ -36,16 +38,41 @@ export function UpdatePoint(point, lat, lon) {
   point.z = Math.cos(lat) * Math.cos(lon);
 }
 
+/**
+ * Returns a normal vector orthogonal to a and b.
+ */
 export function pole(a, b) {
   return a.clone().cross(b).normalize();
 }
 
+/**
+ * Generates two vectors [u, v] which form an orthonormal basis with pole.
+ * Together pole, u, v follow the right hand rule.
+ *
+ * Warning: This function is non-continuous (See Hairy ball theorem). Prefer orthonomalizePoints.
+ *
+ */
 export function orthonomalBasis(normal) {
   const u = Math.abs(normal.x) < 0.9 ? new Vector3(1, 0, 0) : new Vector3(0, 1, 0);
   u.cross(normal).normalize();
   const v = normal.clone().cross(u).normalize();
 
   return [ u, v ];
+}
+
+/**
+ * Generates two vectors [u, v] which form an orthonormal basis with pole.
+ * When pole != a, u points in the direction of a
+ * Together pole, u, v follow the right hand rule.
+ *
+ * Warning: if pole == a then u is chosen non-continuously (See Hairy ball theorem)
+ */
+export function orthonomalizePoints(pole, a) {
+  if (pole.equals(a)) return orthonomalBasis(pole);
+
+  const u = projectToEquator(a, pole);
+  const v = pole.clone().cross(u).normalize();
+  return [u, v];
 }
 
 // Generates a vector orthogonal to the given vector in the same plane as the second vector 
@@ -77,7 +104,7 @@ export function distanceAlongLatitude(pole, latitude, distance) {
   return latitudeArc(pole, latitude, distance, 0)[0];
 }
 
-export function distanceAlongSmallCircle(pole, a, b, distance, lat) {
+export function distanceAlongSmallCircle(pole, a, b, distance, lat, debug) {
   const latitude = lat ? lat : 90 - acos(pole.dot(a));
   const [u,v] = orthonomalBasis(pole);
 
@@ -89,13 +116,15 @@ export function distanceAlongSmallCircle(pole, a, b, distance, lat) {
     a.dot(v),
     a.dot(u)
   )), 360);
-
+  
   const beta = mod(radToDeg(Math.atan2(
     b.dot(v),
     b.dot(u)
   )), 360);
 
   if (beta < alpha) distance = -distance;
+
+  console.log(alpha, beta, distance);
 
   return latitudeArc(pole, latitude, alpha+distance, 0)[0];
 }

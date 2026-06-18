@@ -8,8 +8,10 @@ import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import { mod, round } from "../math/degMath";
+import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
 
-export class Proposition2 extends Model {
+export class Proposition6 extends Model {
 
   constructor() {
     super();
@@ -17,6 +19,7 @@ export class Proposition2 extends Model {
     this.parameters = {
       obliquity: 23.44,
       g_angle: 40,
+      right_ascension: 40,
     };
   }
 
@@ -42,33 +45,44 @@ export class Proposition2 extends Model {
       horizon: new Arc(p.F, p.A, { length: 360 }),
       FG: new Arc(p.F, p.G), 
 
-      declinationLabel: new Label('0', Point()),
       angleA: new RightAngle(p.A, p.E, p.F),
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
       angleH: new RightAngle(p.H, p.E, p.G),
       angleE: new AngleElement(p.E, p.G, p.H),
+      angleG: new AngleElement(p.G, p.H, p.E),
+
+      labelEG: new Label(),
+      labelEH: new Label(),
     };
 
     this.createPointGeometries(p);
   }
 
   updateCalculations() {
-    this.points.B.copy(Point(90, this.parameters.obliquity));
-    this.points.D.copy(Point(-90, -this.parameters.obliquity));
-    this.points.G.copy(distanceAlongArc(this.points.E, this.points.B, this.parameters.g_angle));
-    this.points.H.copy(distanceAlongArc(this.points.F, this.points.G, 90));
+    const p = this.points;
+    const g = this.geometry;
 
-    this.geometry.FG.point2 = this.parameters.g_angle > 0 ? this.points.H : this.points.G;
+    const mEGH = acos(cos(this.parameters.right_ascension) * sin(this.parameters.obliquity));
+    let GE = asin(sin(this.parameters.right_ascension) / sin(mEGH));
+    if (mEGH > 90) GE = mod(180-GE+180, 360)-180;
 
-    const declination = Math.asin(Math.sin(degToRad(this.parameters.obliquity)) * Math.sin(degToRad(this.parameters.g_angle)));
-    const decLabelPos = distanceAlongArc(this.points.G, this.points.H, radToDeg(Math.abs(declination)) / 2);
-    this.geometry.declinationLabel.position = decLabelPos;
-    this.geometry.declinationLabel.text = Math.round(radToDeg(declination * 10))/10;
+    p.B.copy(Point(90, this.parameters.obliquity));
+    p.D.copy(Point(-90, -this.parameters.obliquity));
+    p.G.copy(distanceAlongArc(this.points.E, this.points.B, GE));
+    p.H.copy(distanceAlongArc(this.points.F, this.points.G, 90));
+
+    g.FG.point2 = GE > 0 ? this.points.H : this.points.G;
+
+    g.labelEG.text = round(GE, 1);
+    g.labelEG.position = distanceAlongArc(p.E, p.B, GE / 2);
+
+    g.labelEH.text = this.parameters.right_ascension;
+    g.labelEH.position = distanceAlongArc(this.points.E, this.points.A, this.parameters.right_ascension/2);
   }
 
   setupGui(gui) {
+    gui.addSlider('Right Ascension', this.parameters, 'right_ascension', -179, 179);
     gui.addSlider('Obliquity', this.parameters, 'obliquity', 0, 89);
-    gui.addSlider('G Angle', this.parameters, 'g_angle', -178, 179);
   }
 
 }

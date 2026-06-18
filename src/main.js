@@ -9,6 +9,10 @@ import { Proposition34 } from './models/proposition34';
 import { ModelGui } from './core/gui';
 import { Proposition2Animated } from './models/proposition2-animated';
 import 'katex/dist/katex.min.css';
+import { Proposition3 } from './models/proposition3';
+import { Proposition4 } from './models/proposition4';
+import { Proposition5 } from './models/proposition5';
+import { Proposition6 } from './models/proposition6';
 
 const settings = window.settings = {
   darkMode: true,
@@ -18,6 +22,10 @@ const settings = window.settings = {
 const models = {
   'Proposition 2': Proposition2,
   'Proposition 2 Breakdown': Proposition2Animated, 
+  'Proposition 3': Proposition3,
+  'Proposition 4': Proposition4,
+  'Proposition 5': Proposition5,
+  'Proposition 6': Proposition6,
   'Proposition 7': Proposition7,
   'Proposition 9': Proposition9,
   'Proposition 14': Proposition14,

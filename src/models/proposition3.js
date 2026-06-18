@@ -1,4 +1,4 @@
-import { distanceAlongArc, Point } from "../math/spherical";
+import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
 import { Label } from "../geometry/label";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
@@ -7,15 +7,17 @@ import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
+import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { AngleElement } from "../geometry/angle_element";
 
-export class Proposition2 extends Model {
+export class Proposition3 extends Model {
 
   constructor() {
     super();
 
     this.parameters = {
       obliquity: 23.44,
+      declination: 20,
       g_angle: 40,
     };
   }
@@ -47,28 +49,35 @@ export class Proposition2 extends Model {
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
       angleH: new RightAngle(p.H, p.E, p.G),
       angleE: new AngleElement(p.E, p.G, p.H),
+      g_angleLabel: new Label(),
     };
 
     this.createPointGeometries(p);
   }
 
   updateCalculations() {
+    this.declinationSlider?.setRange(-this.parameters.obliquity, this.parameters.obliquity);
     this.points.B.copy(Point(90, this.parameters.obliquity));
     this.points.D.copy(Point(-90, -this.parameters.obliquity));
-    this.points.G.copy(distanceAlongArc(this.points.E, this.points.B, this.parameters.g_angle));
+
+    const g_distance = asin(sin(this.parameters.declination) / sin(this.parameters.obliquity));
+
+    this.points.G.copy(distanceAlongArc(this.points.E, this.points.B, g_distance));
     this.points.H.copy(distanceAlongArc(this.points.F, this.points.G, 90));
 
-    this.geometry.FG.point2 = this.parameters.g_angle > 0 ? this.points.H : this.points.G;
+    this.geometry.FG.point2 = g_distance > 0 ? this.points.H : this.points.G;
 
-    const declination = Math.asin(Math.sin(degToRad(this.parameters.obliquity)) * Math.sin(degToRad(this.parameters.g_angle)));
-    const decLabelPos = distanceAlongArc(this.points.G, this.points.H, radToDeg(Math.abs(declination)) / 2);
+    const decLabelPos = distanceAlongArc(this.points.G, this.points.H, Math.abs(this.parameters.declination / 2));
     this.geometry.declinationLabel.position = decLabelPos;
-    this.geometry.declinationLabel.text = Math.round(radToDeg(declination * 10))/10;
+    this.geometry.declinationLabel.text = this.parameters.declination;
+
+    this.geometry.g_angleLabel.position = distanceAlongArc(this.points.E, this.points.B, g_distance/2);
+    this.geometry.g_angleLabel.text = round(g_distance, 1);
   }
 
   setupGui(gui) {
+    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', -90, 90);
     gui.addSlider('Obliquity', this.parameters, 'obliquity', 0, 89);
-    gui.addSlider('G Angle', this.parameters, 'g_angle', -178, 179);
   }
 
 }

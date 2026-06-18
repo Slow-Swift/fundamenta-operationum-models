@@ -9,14 +9,14 @@ import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 
-export class Proposition2 extends Model {
+export class Proposition4 extends Model {
 
   constructor() {
     super();
 
     this.parameters = {
-      obliquity: 23.44,
-      g_angle: 40,
+      obliquity: 5,
+      g_angle: 30,
     };
   }
 

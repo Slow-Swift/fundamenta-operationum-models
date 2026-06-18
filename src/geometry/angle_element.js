@@ -24,7 +24,7 @@ export class AngleElement extends LineElement {
 
     if (this.showLabel) {
       this.label.text = distance > 0 ? Math.round(angle * 10) / 10 : '';
-      this.label.position = distanceAlongSmallCircle(this.center, this.leftPoint, this.rightPoint, angle/2, 90-distance-4);
+      this.label.position = distanceAlongSmallCircle(this.center, this.leftPoint, this.rightPoint, angle/2, 90-distance-4, true);
       this.label.update();
     } 
 
