@@ -1,6 +1,5 @@
-import { distanceAlongArc, distanceAlongLatitude, Point, pointFromPole } from "../math/spherical";
+import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
-import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
@@ -95,7 +94,7 @@ export class Proposition34 extends Model {
     g.arcticTangent1.start = -XO;
     g.arcticTangent2.start = -XO;
 
-    p.T.copy(pointFromPole(p.Z, p.X, lat2, -lon));
+    p.T.copy(distanceAlongSmallCircle(p.Z, p.X, -lon, lat2));
 
     const TN = asin(sin(lat2_C) * sin(lon));
     const AN = asin(sin(lat2) / sin(90-TN));

@@ -1,4 +1,4 @@
-import { greatCircleArc, latitudeArc, orthonomalBasis, smallCircleArc, projectToEquator, distanceAlongLatitude, distanceAlongSmallCircle } from "../math/spherical";
+import { smallCircleArc, projectToEquator, distanceAlongSmallCircle } from "../math/spherical";
 import { LineElement } from "./LineElement";
 import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
 import { Label } from "./label";
@@ -28,7 +28,7 @@ export class RightAngle extends LineElement {
 
     if (this.showLabel) {
       this.label.text = Math.round(angle * 10) / 10;
-      this.label.position = distanceAlongSmallCircle(this.center, this.leftPoint, this.rightPoint, angle/2, 90-distance-3);
+      this.label.position = distanceAlongSmallCircle(this.center, this.rightPoint, angle/2, 90-distance-3);
       this.label.update();
     } 
 
@@ -36,7 +36,7 @@ export class RightAngle extends LineElement {
     const poleRight = projectToEquator(this.rightPoint, this.center);
 
     const pointsLeft = smallCircleArc(poleLeft, this.center, poleRight, 0, distance - 90, distance);
-    const pointsRight = smallCircleArc(poleRight, this.center, poleLeft, 0, distance - 90, distance);
+    const pointsRight = smallCircleArc(poleRight, this.center, poleLeft, 0, -distance - 90, distance);
 
     const points = pointsLeft.concat(pointsRight);
     return points;

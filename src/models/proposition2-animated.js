@@ -1,4 +1,4 @@
-import { distanceAlongArc, distanceAlongLatitude, Point } from "../math/spherical";
+import { distanceAlongArc, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
 import { Label } from "../geometry/label";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
@@ -74,7 +74,7 @@ export class Proposition2Animated extends Model {
     this.geometry.declinationLabel.text = Math.round(radToDeg(declination * 10))/10;
 
     this.geometry.g_angleLabel.text = Math.round(this.parameters.g_angle * 10)/10;
-    this.geometry.g_angleLabel.position = distanceAlongLatitude(Point(-90, 90-this.parameters.obliquity), 5, this.parameters.g_angle / 2);
+    this.geometry.g_angleLabel.position = distanceAlongArc(this.points.E, this.points.G, this.parameters.g_angle / 2);
   }
 
   setState(state) {

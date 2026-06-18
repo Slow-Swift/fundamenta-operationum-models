@@ -1,4 +1,4 @@
-import { greatCircleArc, latitudeArc, orthonomalBasis, smallCircleArc } from "../math/spherical";
+import { smallCircleArc } from "../math/spherical";
 import { LineElement } from "./LineElement";
 
 export class SmallCircleArc extends LineElement {

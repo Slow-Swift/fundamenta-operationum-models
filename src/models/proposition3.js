@@ -1,7 +1,6 @@
-import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
+import { distanceAlongArc, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
 import { Label } from "../geometry/label";
-import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";

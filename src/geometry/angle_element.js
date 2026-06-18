@@ -1,4 +1,4 @@
-import { greatCircleArc, latitudeArc, orthonomalBasis, smallCircleArc, projectToEquator, distanceAlongLatitude, distanceAlongSmallCircle } from "../math/spherical";
+import { smallCircleArc, projectToEquator, distanceAlongSmallCircle } from "../math/spherical";
 import { LineElement } from "./LineElement";
 import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
 import { Label } from "./label";
@@ -24,11 +24,11 @@ export class AngleElement extends LineElement {
 
     if (this.showLabel) {
       this.label.text = distance > 0 ? Math.round(angle * 10) / 10 : '';
-      this.label.position = distanceAlongSmallCircle(this.center, this.leftPoint, this.rightPoint, angle/2, 90-distance-4, true);
+      this.label.position = distanceAlongSmallCircle(this.center, this.rightPoint, angle/2, 90-distance-4, true);
       this.label.update();
     } 
 
-    const points = smallCircleArc(this.center, this.leftPoint, this.rightPoint, 0, 0, 90-distance);
+    const points = smallCircleArc(this.center, this.rightPoint, this.leftPoint, 0, 0, 90-distance);
     return points;
   }
 
