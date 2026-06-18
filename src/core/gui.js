@@ -33,6 +33,7 @@ export class ModelGui {
     this.domElement.appendChild(this.pageControls);
 
     this.modelDropdown = document.createElement('select');
+    this.modelDropdown.classList.add('model-dropdown');
     this.pageControls.appendChild(this.modelDropdown);
     this.modelDropdown.oninput = () => onselected(this.modelDropdown.value);
 
