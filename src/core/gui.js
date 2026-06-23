@@ -32,9 +32,13 @@ export class ModelGui {
     this.pageControls.classList.add('page-controls');
     this.domElement.appendChild(this.pageControls);
 
+    const dropdownWrapper = document.createElement('div');
+    dropdownWrapper.classList.add('select-wrapper');
+    this.pageControls.appendChild(dropdownWrapper);
+
     this.modelDropdown = document.createElement('select');
     this.modelDropdown.classList.add('model-dropdown');
-    this.pageControls.appendChild(this.modelDropdown);
+    dropdownWrapper.appendChild(this.modelDropdown);
     this.modelDropdown.oninput = () => onselected(this.modelDropdown.value);
 
     for (const option in options) {
@@ -46,9 +50,37 @@ export class ModelGui {
 
     this.modelDropdown.value = selected;
 
+    const toggleWrapper = document.createElement('div');
+    toggleWrapper.classList.add('theme-toggle-wrap');
+
     this.darkToggle = document.createElement('input');
     this.darkToggle.type = 'checkbox';
-    this.pageControls.appendChild(this.darkToggle);
+    this.darkToggle.id = 'theme-toggle';
+    this.darkToggle.ariaLabel = 'Toggle dark mode';
+    this.darkToggle.classList.add('theme-toggle-input');
+
+    const toggleLabel = document.createElement('label');
+    toggleLabel.htmlFor = 'theme-toggle';
+    toggleLabel.classList.add('theme-toggle');
+    
+    const sunIcon = document.createElement('span');
+    const moonIcon = document.createElement('span');
+    const thumb = document.createElement('span');
+    sunIcon.classList.add('theme-icon', 'sun');
+    moonIcon.classList.add('theme-icon', 'moon');
+    thumb.classList.add('theme-toggle-thumb');
+    sunIcon.ariaHidden = 'true';
+    moonIcon.ariaHidden = 'true';
+    sunIcon.innerText = '☀';
+    moonIcon.innerText = '☾';
+
+    toggleWrapper.appendChild(this.darkToggle);
+    toggleWrapper.appendChild(toggleLabel);
+    toggleLabel.appendChild(thumb);
+    toggleLabel.appendChild(sunIcon);
+    toggleLabel.appendChild(moonIcon);
+
+    this.pageControls.appendChild(toggleWrapper);
     this.darkToggle.checked = darkTheme;
     this.darkToggle.oninput = () => onThemeChange(this.darkToggle.checked);
   }
