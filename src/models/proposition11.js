@@ -99,8 +99,6 @@ export class Proposition11 extends Model {
     const MQK = acos(sin(MKQ) * cos(KM));
 
     const KQ = MKQ > 90 ? (obl > 0 ? 180 : -180) - asin(sin(KM) / sin(MQK)) : asin(sin(KM) / sin(MQK));
-    console.log(asin(sin(KM) / sin(MQK)))
-
     const LQ = KL + KQ;
 
     this.calculations.KL = KL;
