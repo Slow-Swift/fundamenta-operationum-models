@@ -15,7 +15,7 @@ export class Proposition3 extends Model {
     super();
 
     this.parameters = {
-      obliquity: 23.44,
+      obliquity: 23.5,
       declination: 20,
       g_angle: 40,
     };
@@ -76,7 +76,6 @@ export class Proposition3 extends Model {
 
   setupGui(gui) {
     this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', -90, 90);
-    gui.addSlider('Obliquity', this.parameters, 'obliquity', 0, 89);
   }
 
 }

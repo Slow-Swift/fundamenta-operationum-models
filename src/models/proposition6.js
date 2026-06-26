@@ -17,7 +17,7 @@ export class Proposition6 extends Model {
     super();
 
     this.parameters = {
-      obliquity: 23.44,
+      obliquity: 23.5,
       g_angle: 40,
       right_ascension: 40,
     };
@@ -82,7 +82,6 @@ export class Proposition6 extends Model {
 
   setupGui(gui) {
     gui.addSlider('Right Ascension', this.parameters, 'right_ascension', -179, 179);
-    gui.addSlider('Obliquity', this.parameters, 'obliquity', 0, 89);
   }
 
 }

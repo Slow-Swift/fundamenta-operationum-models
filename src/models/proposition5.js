@@ -17,7 +17,7 @@ export class Proposition5 extends Model {
     super();
 
     this.parameters = {
-      obliquity: 23.44,
+      obliquity: 23.5,
       g_angle: 40,
     };
   }
@@ -82,8 +82,7 @@ export class Proposition5 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Obliquity', this.parameters, 'obliquity', 0, 89);
-    gui.addSlider('G Angle', this.parameters, 'g_angle', -178, 179);
+    gui.addSlider('Ecliptic Distance', this.parameters, 'g_angle', -178, 179);
   }
 
 }

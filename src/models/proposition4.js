@@ -8,6 +8,7 @@ import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import { round } from "../math/degMath";
 
 export class Proposition4 extends Model {
 
@@ -47,6 +48,7 @@ export class Proposition4 extends Model {
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
       angleH: new RightAngle(p.H, p.E, p.G),
       angleE: new AngleElement(p.E, p.G, p.H),
+      g_angleLabel: new Label(),
     };
 
     this.createPointGeometries(p);
@@ -64,11 +66,12 @@ export class Proposition4 extends Model {
     const decLabelPos = distanceAlongArc(this.points.G, this.points.H, radToDeg(Math.abs(declination)) / 2);
     this.geometry.declinationLabel.position = decLabelPos;
     this.geometry.declinationLabel.text = Math.round(radToDeg(declination * 10))/10;
+    this.geometry.g_angleLabel.position = distanceAlongArc(this.points.E, this.points.B, this.parameters.g_angle/2);
+    this.geometry.g_angleLabel.text = round(this.parameters.g_angle, 1);
   }
 
   setupGui(gui) {
-    gui.addSlider('Obliquity', this.parameters, 'obliquity', 0, 89);
-    gui.addSlider('G Angle', this.parameters, 'g_angle', -178, 179);
+    gui.addSlider('Moon Distance', this.parameters, 'g_angle', -179, 179);
   }
 
 }
