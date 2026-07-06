@@ -22,6 +22,7 @@ export class Model {
       this.scene.add(this.geometry[geometry].mesh);
     }
 
+    this.gui = gui;
     this.setupGui(gui);
     if (this.lazy) { gui.onSliderChanged = () => this.update() }
     
@@ -36,18 +37,23 @@ export class Model {
     }
   }
 
+  updateRender(time, camera) {
+    // Update Animations
+    for (const animation of this.animations) {
+      animation.update(time);
+    }
+    this.animations = this.animations.filter(a => !a.completed);
+
+    for (const geometry in this.geometry) {
+      this.geometry[geometry].updateRender(time, camera);
+    }
+  }
+
   cancelAnimations() {
     for (const animation of this.animations) {
       animation.complete();
     }
     this.animations.length = 0;
-  }
-
-  updateAnimations(time) {
-    for (const animation of this.animations) {
-      animation.update(time);
-    }
-    this.animations = this.animations.filter(a => !a.completed);
   }
 
   addAnimation(animation) {
@@ -61,6 +67,8 @@ export class Model {
   setState() {}
 
   dispose() {
+    this.gui.onSliderChanged = undefined;
+
     for (const geometry in this.geometry) {
       this.scene.remove(this.geometry[geometry].mesh);
       this.geometry[geometry].dispose();
@@ -76,7 +84,7 @@ export class Model {
       const pointGeom = new PointGeom(points[point], {color: 0x967e62, darkColor: 0x81694d, visible: !hidden.includes(points[point])});
       this.geometry[point] = pointGeom;
       this.pointGeometries[point] = pointGeom;
-      pointGeom.mesh.add(new Label(point, new THREE.Vector3(0, 0, 0)).mesh);
+      pointGeom.addChild(new Label(point, new THREE.Vector3(0, 0, 0)));
     }
   }
 

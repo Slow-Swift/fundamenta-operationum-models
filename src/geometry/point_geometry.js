@@ -12,7 +12,6 @@ export class PointGeom extends ModelElement {
     this.distance = distance;
     this.material = new THREE.MeshBasicMaterial({ color: this.color });
     this.mesh = new THREE.Mesh(PointGeom.POINT_GEOMETRY, this.material);
-    this.mesh.position.copy(this.point);
     this.scale = scale;
     this.mesh.scale.setScalar(scale*PointGeom.POINT_SCALE);
     this.mesh.visible = this.visible;
@@ -25,6 +24,7 @@ export class PointGeom extends ModelElement {
 
   update() {
     super.update();
-    this.mesh.position.copy(this.point);
+    const point = typeof(this.point) == 'function' ? this.point() : this.point;
+    this.mesh.position.copy(point);
   }
 }

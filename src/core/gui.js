@@ -91,6 +91,7 @@ export class ModelGui {
     for (const slider of this.sliders) {
       this.sliderArea.removeChild(slider);
     }
+
     this.sliders.length=0;
   }
 
@@ -161,15 +162,30 @@ export class ModelGui {
       this.onSliderChanged?.();
     }
     text.innerText = `${label}: ${input.value}`
+    
+    const rangeLabels = document.createElement('div');
+    rangeLabels.classList.add('slider-range');
+    const startLabel = document.createElement('p');
+    const endLabel = document.createElement('p');
+    startLabel.innerText = '0';
+    endLabel.innerText = '90';
+    startLabel.classList.add('slider-label-start');
+    endLabel.classList.add('slider-label-end');
+
+    rangeLabels.appendChild(startLabel);
+    rangeLabels.appendChild(endLabel);
 
     slider.appendChild(text);
     slider.appendChild(input);
+    slider.appendChild(rangeLabels);
     this.sliderArea.appendChild(slider);
     this.sliders.push(slider);
 
     slider.setRange = function (min, max) {
       input.min = round(min, 1);
       input.max = round(max, 1);
+      startLabel.innerText = input.min;
+      endLabel.innerText = input.max;
 
       input.value = slider.lastSetValue;
 
@@ -181,7 +197,8 @@ export class ModelGui {
 
       input.oninput();
     }
+    slider.setRange(min, max);
 
     return slider;
   }
-} 
+}

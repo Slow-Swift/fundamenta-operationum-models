@@ -12,7 +12,8 @@ export class Equator extends LineElement {
   }
 
   generatePoints() {
-    const [ u, v ] = orthonomalBasis(this.pole); 
+    const pole = typeof(this.pole) == 'function' ? this.pole() : this.pole;
+    const [ u, v ] = orthonomalBasis(pole); 
     const points = greatCircleArc(u, v, this.start, this.length); 
     return points;
   }

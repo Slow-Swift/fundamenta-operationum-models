@@ -3,6 +3,16 @@ import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { sin, cos, tan, asin, acos, atan, mod } from "../math/degMath";
 
 export function Point(lat=0, lon=0, visible=true) {
+  if (typeof(lat) == "function") {
+    if (typeof(lon) == "function") {
+      return () => Point(lat(), lon(), visible);
+    } else {
+      return () => Point(lat(), lon, visible);
+    }
+  } else if(typeof(lon) == "function") {
+    return () => Point(lat, lon(), visible);
+  }
+
   lat = lat * Math.PI / 180;
   lon = lon * Math.PI / 180;
 
@@ -20,8 +30,16 @@ export function UpdatePoint(point, lat, lon) {
 }
 
 export function distanceAlongArc(a, b, distance) {
-  const basis = basisFromPoints(a, b);
-  return pointAlongBasis(basis, distance);
+  if (typeof a === 'function' || typeof b === 'function' || typeof distance === 'function') {
+    return function() {
+      const evalA = typeof a === 'function' ? a() : a;
+      const evalB = typeof b === 'function' ? b() : b;
+      const evalDistance = typeof distance === 'function' ? distance() : distance;
+      return pointAlongBasis(basisFromPoints(evalA, evalB), evalDistance);
+    };
+  }
+
+  return pointAlongBasis(basisFromPoints(a, b), distance);
 }
 
 export function greatCircleArc(a, b, start=0, length=360) {
@@ -30,6 +48,16 @@ export function greatCircleArc(a, b, start=0, length=360) {
 }
 
 export function distanceAlongSmallCircle(pole, a, distance, lat) {
+  if (typeof pole === 'function' || typeof a === 'function' || typeof distance === 'function' || typeof lat === 'function') {
+    return function() {
+      const evalPole = typeof pole === 'function' ? pole() : pole;
+      const evalA = typeof a === 'function' ? a() : a;
+      const evalDistance = typeof distance === 'function' ? distance() : distance;
+      const evalLat = typeof lat === 'function' ? lat() : lat;
+      return pointAlongBasis(basisFromPole(evalPole, { startDirection: evalA, latitude: evalLat }), evalDistance);
+    };
+  }
+  
   const basis = basisFromPole(pole, { startDirection: a, latitude: lat });
   return pointAlongBasis(basis, distance);
 }

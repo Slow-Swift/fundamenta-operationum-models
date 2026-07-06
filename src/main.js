@@ -13,6 +13,10 @@ import { Proposition3 } from './models/proposition3';
 import { Proposition4 } from './models/proposition4';
 import { Proposition5 } from './models/proposition5';
 import { Proposition6 } from './models/proposition6';
+import { Proposition8 } from './models/proposition8';
+import { Proposition11 } from './models/proposition11';
+import { Rising } from './models/rising';
+import { Proposition13 } from './models/proposition13';
 
 const settings = window.settings = {
   darkMode: true,
@@ -27,7 +31,10 @@ const models = {
   'Proposition 5': Proposition5,
   'Proposition 6': Proposition6,
   'Proposition 7': Proposition7,
+  'Proposition 8': Proposition8,
   'Proposition 9': Proposition9,
+  'Proposition 11': Proposition11,
+  'Proposition 13': Proposition13,
   'Proposition 14': Proposition14,
   'Proposition 34': Proposition34,
 };
@@ -112,7 +119,7 @@ function animate(time) {
   controls.update();
   controls.rotateSpeed = orthographic_camera.zoom > 1 ? 1/orthographic_camera.zoom : 1;
   model.updatePointSize(orthographic_camera.zoom);
-  model.updateAnimations(time/1000);
+  model.updateRender(time/1000, orthographic_camera);
   renderer.render(model.scene, orthographic_camera);
   labelRenderer.render(model.scene, orthographic_camera);
   if (!model.lazy) model.update();

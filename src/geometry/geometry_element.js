@@ -5,6 +5,7 @@ export class ModelElement {
     this.color = this.lightColor;
     this.darkColor = darkColor;
     this.visible = visible; 
+    this.children = [];
   }
 
   setVisible(visible) {
@@ -19,6 +20,25 @@ export class ModelElement {
     this.material.setValues({ color: this.color });
   }
 
+  updateRender(time, camera) {
+    for (const child of this.children) {
+      child.updateRender(time, camera);
+    }
+  }
+
+  addChild(child) {
+    this.children.push(child);
+    this.mesh?.add(child.mesh);
+  }
+  
+  removeChild(child) {
+    const index = this.children.indexOf(child);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+      this.mesh?.remove(child.mesh);
+    }
+  }
+
   dispose() {
     this.geometry?.dispose();
     this.material?.dispose();
@@ -30,6 +50,7 @@ export class ModelElement {
 
       this.mesh = null;
     }
+    this.children.length = 0;
   }
 }
 

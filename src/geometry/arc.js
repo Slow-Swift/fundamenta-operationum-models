@@ -17,14 +17,19 @@ export class Arc extends LineElement {
   }
 
   generatePoints() {
-    const angle = Math.acos(clamp(this.point1.dot(this.point2), -1, 1));
+    const p1 = typeof(this.point1) == 'function' ? this.point1() : this.point1;
+    const p2 = typeof(this.point2) == 'function' ? this.point2() : this.point2;
+
+    const angle = Math.acos(clamp(p1.dot(p2), -1, 1));
     const length = this.length != 0 ? this.length : radToDeg(angle) + this.end - this.start;
-    const points = greatCircleArc(this.point1, this.point2, this.start, length);
+    const points = greatCircleArc(p1, p2, this.start, length);
     return points;
   }
 
   angle() {
-    return acos(this.point1.clone().dot(this.point2));
+    const p1 = typeof(this.point1) == 'function' ? this.point1() : this.point1;
+    const p2 = typeof(this.point2) == 'function' ? this.point2() : this.point2;
+    return acos(p1.clone().dot(p2));
   }
 }
 

@@ -12,23 +12,27 @@ export class AngleElement extends LineElement {
     this.rightPoint = rightPoint;
     this.showLabel = label;
     this.label = new Label();
-    this.mesh.add(this.label.mesh);
+    this.addChild(this.label);
   }
 
   generatePoints() {
-    const leftDst = acos(this.center.clone().dot(this.leftPoint));
-    const rightDst = acos(this.center.clone().dot(this.rightPoint));
-    const distance = Math.min(7, leftDst/2, rightDst/2);
+    const center = typeof(this.center) == 'function' ? this.center() : this.center;
+    const leftPoint = typeof(this.leftPoint) == 'function' ? this.leftPoint() : this.leftPoint;
+    const rightPoint = typeof(this.rightPoint) == 'function' ? this.rightPoint() : this.rightPoint;
 
-    const angle = acos(projectToEquator(this.leftPoint, this.center).dot(projectToEquator(this.rightPoint, this.center)));
+    const leftDst = acos(center.clone().dot(leftPoint));
+    const rightDst = acos(center.clone().dot(rightPoint));
+    const distance = Math.min(7, leftDst/3, rightDst/3);
+
+    const angle = acos(projectToEquator(leftPoint, center).dot(projectToEquator(rightPoint, center)));
 
     if (this.showLabel) {
       this.label.text = distance > 0 ? Math.round(angle * 10) / 10 : '';
-      this.label.position = distanceAlongSmallCircle(this.center, this.rightPoint, angle/2, 90-distance-4, true);
+      this.label.position = distanceAlongSmallCircle(center, rightPoint, angle/2, 90-distance * 1.3, true);
       this.label.update();
     } 
 
-    const points = smallCircleArc(this.center, this.rightPoint, this.leftPoint, 0, 0, 90-distance);
+    const points = smallCircleArc(center, rightPoint, leftPoint, 0, 0, 90-distance);
     return points;
   }
 
