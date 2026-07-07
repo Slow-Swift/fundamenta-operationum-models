@@ -17,6 +17,7 @@ import { Proposition8 } from './models/proposition8';
 import { Proposition11 } from './models/proposition11';
 import { Rising } from './models/rising';
 import { Proposition13 } from './models/proposition13';
+import { Proposition15 } from './models/proposition15';
 
 const settings = window.settings = {
   darkMode: true,
@@ -36,6 +37,7 @@ const models = {
   'Proposition 11': Proposition11,
   'Proposition 13': Proposition13,
   'Proposition 14': Proposition14,
+  'Proposition 15': Proposition15,
   'Proposition 34': Proposition34,
 };
 

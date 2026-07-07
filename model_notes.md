@@ -50,4 +50,7 @@
 - When the oblique ascension is negative the calculated arcs are negative. Should I leave it so or 
     take their absolute values.
 
-
+## Proposition 14
+- When latitude = 90, the altitude is undefined which means things like the altitude label dissappear.
+    Currently I've set it to 90 in such a case since that is the limit as latitude approaches 0. 
+    Should I instead just display "Undefined"?

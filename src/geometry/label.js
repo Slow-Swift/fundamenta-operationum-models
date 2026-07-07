@@ -25,7 +25,7 @@ export class Label {
     const position = typeof(this.position) == 'function' ? this.position() : this.position;
     const text = typeof(this.text) == 'function' ? this.text() : this.text;
 
-    katex.render(text.toString(), this.div, { displayMode: false });
+    katex.render((text ?? '').toString(), this.div, { displayMode: false });
     this.mesh.position.copy(position);
   }
 
