@@ -6,7 +6,7 @@ export function tan(a) { return Math.tan(degToRad(a)) };
 
 export function asin(a) { return radToDeg(Math.asin(clamp(a, -1, 1))) };
 export function acos(a) { return radToDeg(Math.acos(clamp(a, -1, 1))) };
-export function atan(a) { return radToDeg(clamp(a, -1, 1)) };
+export function atan(a) { return radToDeg(Math.atan(clamp(a, -1, 1))) };
 
 export function asinn(a) { return radToDeg(Math.asin(a)) };
 export function acosn(a) { return radToDeg(Math.acos(a)) };

@@ -72,7 +72,7 @@ export class Proposition2 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Ecliptic Distance', this.parameters, 'g_angle', -179, 179);
+    gui.addSlider('Ecliptic Longitude', this.parameters, 'g_angle', -179, 179);
   }
 
 }

@@ -62,7 +62,7 @@ export class Proposition15 extends Model {
       angle_B: new RightAngle(p.B, p.A, p.E),
       angle_S: new RightAngle(p.S, p.Z, p.O),
       angle_Z: new AngleElement(p.Z, p.O, p.S),
-      angle_H: new AngleElement(p.H, p.O, p.S, {alwaysSmallest: false}),
+      angle_H: new AngleElement(p.H, p.O, p.S),
     };
 
     this.createPointGeometries(p);

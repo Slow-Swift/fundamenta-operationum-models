@@ -18,6 +18,10 @@ import { Proposition11 } from './models/proposition11';
 import { Rising } from './models/rising';
 import { Proposition13 } from './models/proposition13';
 import { Proposition15 } from './models/proposition15';
+import { Proposition16 } from './models/proposition16';
+import { Proposition17 } from './models/proposition17';
+import { Proposition17Equator } from './models/proposition17_equator';
+import { Proposition18 } from './models/proposition18';
 
 const settings = window.settings = {
   darkMode: true,
@@ -38,6 +42,10 @@ const models = {
   'Proposition 13': Proposition13,
   'Proposition 14': Proposition14,
   'Proposition 15': Proposition15,
+  'Proposition 16': Proposition16,
+  'Proposition 17': Proposition17,
+  'Proposition 17 with Equator': Proposition17Equator,
+  'Proposition 18': Proposition18,
   'Proposition 34': Proposition34,
 };
 

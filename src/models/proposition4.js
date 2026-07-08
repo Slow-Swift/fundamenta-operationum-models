@@ -71,7 +71,7 @@ export class Proposition4 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Moon Distance', this.parameters, 'g_angle', -179, 179);
+    gui.addSlider('Lunar Longitude', this.parameters, 'g_angle', -179, 179);
   }
 
 }
