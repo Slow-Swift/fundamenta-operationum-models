@@ -10,6 +10,8 @@ import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import { round } from "../math/degMath";
 import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
+import * as TriangleSolver from "../math/TriangleSolver";
+
 
 export class Proposition5 extends Model {
 
@@ -71,18 +73,18 @@ export class Proposition5 extends Model {
     g.labelEG.text = this.parameters.g_angle;
     g.labelEG.position = distanceAlongArc(p.E, p.B, this.parameters.g_angle / 2);
 
-    const declination = asin(sin(this.parameters.obliquity) * sin(this.parameters.g_angle));
+    const declination = TriangleSolver.opposite(this.parameters.obliquity, this.parameters.g_angle);
     g.labelGH.position = distanceAlongArc(this.points.G, this.points.H, Math.abs(declination) / 2);
     g.labelGH.text = round(declination, 1);
 
-    const rightAscension = acos(cos(this.parameters.g_angle) / cos(declination) ) * (declination < 0 ? -1 : 1);
+    const rightAscension = TriangleSolver.adjacent(this.parameters.obliquity, this.parameters.g_angle); 
     g.labelEH.text = round(rightAscension, 1);
     g.labelEH.position = distanceAlongArc(this.points.E, this.points.A, rightAscension/2);
 
   }
 
   setupGui(gui) {
-    gui.addSlider('Ecliptic Longitude', this.parameters, 'g_angle', -178, 179);
+    gui.addSlider('Ecliptic Longitude', this.parameters, 'g_angle', -179, 179);
   }
 
 }

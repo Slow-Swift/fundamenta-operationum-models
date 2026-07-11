@@ -8,6 +8,7 @@ import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import { proposition17 } from "../math/propositions";
 
 export class Proposition17Equator extends Model {
 
@@ -49,6 +50,7 @@ export class Proposition17Equator extends Model {
       EL: new Arc(p.E, p.L),
       angleV: new AngleElement(p.V, p.E, p.L),
       angleD: new RightAngle(p.D, p.E, p.Z),
+      angleDEC: new AngleElement(p.E, p.D, p.C),
     };
 
     this.createPointGeometries(p);

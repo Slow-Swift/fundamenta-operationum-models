@@ -9,6 +9,7 @@ import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import { round } from "../math/degMath";
+import * as TriangleSolver from "../math/TriangleSolver";
 
 export class Proposition4 extends Model {
 
@@ -62,10 +63,10 @@ export class Proposition4 extends Model {
 
     this.geometry.FG.point2 = this.parameters.g_angle > 0 ? this.points.H : this.points.G;
 
-    const declination = Math.asin(Math.sin(degToRad(this.parameters.obliquity)) * Math.sin(degToRad(this.parameters.g_angle)));
-    const decLabelPos = distanceAlongArc(this.points.G, this.points.H, radToDeg(Math.abs(declination)) / 2);
+    const declination = TriangleSolver.opposite(this.parameters.obliquity, this.parameters.g_angle);
+    const decLabelPos = distanceAlongArc(this.points.G, this.points.H, Math.abs(declination) / 2);
     this.geometry.declinationLabel.position = decLabelPos;
-    this.geometry.declinationLabel.text = Math.round(radToDeg(declination * 10))/10;
+    this.geometry.declinationLabel.text = round(declination, 1); 
     this.geometry.g_angleLabel.position = distanceAlongArc(this.points.E, this.points.B, this.parameters.g_angle/2);
     this.geometry.g_angleLabel.text = round(this.parameters.g_angle, 1);
   }

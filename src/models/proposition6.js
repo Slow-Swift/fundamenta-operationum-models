@@ -10,6 +10,8 @@ import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import { mod, round } from "../math/degMath";
 import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
+import * as TriangleSolver from "../math/TriangleSolver";
+
 
 export class Proposition6 extends Model {
 
@@ -34,7 +36,7 @@ export class Proposition6 extends Model {
 
       F: Point(0, 90), // North Pole
       G: Point(),
-      H: Point(),
+      H: Point(() => this.parameters.right_ascension, 0),
     };
 
 
@@ -44,6 +46,7 @@ export class Proposition6 extends Model {
       ecliptic: new Arc(p.E, p.B, { length: 360 }),
       horizon: new Arc(p.F, p.A, { length: 360 }),
       FG: new Arc(p.F, p.G), 
+      FH: new Arc(p.F, p.H),
 
       angleA: new RightAngle(p.A, p.E, p.F),
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
@@ -62,16 +65,11 @@ export class Proposition6 extends Model {
     const p = this.points;
     const g = this.geometry;
 
-    const mEGH = acos(cos(this.parameters.right_ascension) * sin(this.parameters.obliquity));
-    let GE = asin(sin(this.parameters.right_ascension) / sin(mEGH));
-    if (mEGH > 90) GE = mod(180-GE+180, 360)-180;
+    const GE = TriangleSolver.hypoteneusFromAdjacent(this.parameters.obliquity, this.parameters.right_ascension);
 
     p.B.copy(Point(90, this.parameters.obliquity));
     p.D.copy(Point(-90, -this.parameters.obliquity));
     p.G.copy(distanceAlongArc(this.points.E, this.points.B, GE));
-    p.H.copy(distanceAlongArc(this.points.F, this.points.G, 90));
-
-    g.FG.point2 = GE > 0 ? this.points.H : this.points.G;
 
     g.labelEG.text = round(GE, 1);
     g.labelEG.position = distanceAlongArc(p.E, p.B, GE / 2);

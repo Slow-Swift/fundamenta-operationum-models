@@ -11,6 +11,7 @@ import { SmallCircleArc } from "../geometry/small_circle_arc";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import { proposition11 } from "../math/propositions";
 
 export class Proposition11 extends Model {
 
@@ -81,10 +82,9 @@ export class Proposition11 extends Model {
   }
 
   updateCalculations() {
-    const p = this.points;
-    const g = this.geometry;
-    const lat = this.parameters.latitude;
-    const obl = this.parameters.oblique_ascension;
+    const p = this.parameters;
+    const lat = p.latitude;
+    const obl = p.oblique_ascension;
 
     const EKL = acos(cos(obl) * sin(this.parameters.obliquity));
     const KL = asin(sin(obl) / sin(EKL));

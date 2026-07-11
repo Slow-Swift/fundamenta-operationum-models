@@ -8,6 +8,7 @@ import { Vector3 } from "three";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import * as TriangleSolver from "../math/TriangleSolver";
 
 export class Proposition8 extends Model {
 
@@ -74,7 +75,7 @@ export class Proposition8 extends Model {
     this.points.H.copy(Point(-this.parameters.ortiveAmplitude, 0));
     this.points.K.copy(distanceAlongArc(this.points.Z, this.points.H, 90));
 
-    const declination = asin(sin(90 - this.parameters.latitude) * sin(this.parameters.ortiveAmplitude));
+    const declination = TriangleSolver.opposite(90 - this.parameters.latitude, this.parameters.ortiveAmplitude); // asin(sin(90 - this.parameters.latitude) * sin(this.parameters.ortiveAmplitude));
     
     this.geometry.ortiveAmplitudeLabel.text = Math.round(this.parameters.ortiveAmplitude*10)/10;
     this.geometry.ortiveAmplitudeLabel.position = Point(-this.parameters.ortiveAmplitude / 2, 0);

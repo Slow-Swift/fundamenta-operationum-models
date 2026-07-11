@@ -210,5 +210,15 @@ function pointAlongBasis([u, v, centre = new Vector3()], angle) {
       .add(centre);
 }
 
+export function angle(center, leftPoint, rightPoint, alwaysSmallest=true) {
+    let poleLeft = projectToEquator(leftPoint, center);
+    let poleRight = projectToEquator(rightPoint, center);
+    const alignment = center.clone().cross(poleLeft).dot(poleRight) > 0;
 
+    if(alwaysSmallest && alignment > 0) {
+      [leftPoint, rightPoint] = [rightPoint, leftPoint];
+    }
+
+    return (alignment > 0 && !alwaysSmallest ? 180 : 0) + acos(projectToEquator(leftPoint, center).dot(projectToEquator(rightPoint, center)));
+}
 

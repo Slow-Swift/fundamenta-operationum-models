@@ -47,9 +47,11 @@ export class Proposition14 extends Model {
       edge: new Equator(p.E),
       HO: new Arc(p.H, p.E),
       ZO: new Arc(p.Z, p.M),
+      OE: new Arc(p.O, p.E),
+      OM: new Arc(p.O, p.M),
       
       altitudeLabel: new Label(() => round(c.altitude, 1), Point(0, () => c.altitude / 2)),
-      declinationLabel: new Label(() => round(this.parameters.declination, 1), distanceAlongArc(p.M, p.O, () => this.parameters.declination / 2)),
+      declinationLabel: new Label(() => round(this.parameters.declination, 1), distanceAlongArc(p.M, p.O, () => Math.abs(this.parameters.declination) / 2)),
 
       // Angles
       angle_B: new RightAngle(p.B, p.A, p.E),
@@ -66,7 +68,7 @@ export class Proposition14 extends Model {
     const c = this.calculations;
     const p = this.parameters;
 
-    this.declinationSlider?.setRange(0, Math.min(p.latitude, 23.5));
+    this.declinationSlider?.setRange(-Math.min(p.latitude, 23.5), Math.min(p.latitude, 23.5));
 
     c.altitude = p.latitude == 0 ? 90 : asin(sin(p.declination) / sin(p.latitude));
   }

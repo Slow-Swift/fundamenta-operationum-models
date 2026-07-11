@@ -8,6 +8,7 @@ import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import { proposition13, proposition15 } from "../math/propositions";
 
 export class Proposition15 extends Model {
 
@@ -76,6 +77,8 @@ export class Proposition15 extends Model {
     const OZS = p.time * 180 / 12;
     c.OS = asin(sin(OZS) * sin(90 - p.declination));
     c.KE = acos(this.points.K().dot(this.points.E));
+    const altitude = proposition13(p.declination, 180 - OZS, p.latitude);
+    console.log('--', c.KE, proposition15(p.declination, altitude, 180 - OZS));
   }
 
   setupGui(gui) {

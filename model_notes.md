@@ -51,6 +51,9 @@ distance of the sun from the meridian, but he isn't referring to the shortest (g
 rather the distance the earth must rotate for it to reach the meridian, the distance when projected onto the 
 equator, or equivalently the distance along a latitude line (small circle).
 
+Additionally, one of the parameters is the declination of the sun to the equator but the equator
+is not pictured.
+
 ## Proposition 17
 This problem is especially confusing since Reggie uses point E which has thus far been the east point
 of the equator or horizon. In this case however, E is a point on the ecliptic which can move along 

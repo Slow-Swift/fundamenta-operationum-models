@@ -8,6 +8,8 @@ import { Vector3 } from "three";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import * as TriangleSolver from "../math/TriangleSolver";
+
 
 export class Proposition7 extends Model {
 
@@ -71,8 +73,8 @@ export class Proposition7 extends Model {
     this.points.A.copy(Point(-90, 90-this.parameters.latitude));
     this.points.C.copy(Point(90, -90+this.parameters.latitude));
 
-    console.log(this.parameters.declination, this.parameters.latitude);
-    const ortiveAmplitude = asin(sin(this.parameters.declination) / sin(90 - this.parameters.latitude));
+    
+    const ortiveAmplitude = TriangleSolver.hypoteneusFromOpposite(90 - this.parameters.latitude, this.parameters.declination); 
     this.points.H.copy(Point(-ortiveAmplitude, 0));
     this.points.K.copy(distanceAlongArc(this.points.Z, this.points.H, 90));
     

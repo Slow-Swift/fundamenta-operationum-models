@@ -5,11 +5,10 @@ import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
-import { LatitudeCircle } from "../geometry/latitude_circle";
-import { SmallCircleArc } from "../geometry/small_circle_arc";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
+import { proposition13 } from "../math/propositions";
 
 export class Proposition13 extends Model {
 
@@ -19,7 +18,7 @@ export class Proposition13 extends Model {
     this.parameters = {
       latitude: 52.9,
       declination: 20,
-      time: 0,
+      time: 6,
       obliquity: 23.5,
     };
 
@@ -50,6 +49,7 @@ export class Proposition13 extends Model {
     p.L = distanceAlongArc(p.E, p.D, () => this.calculations.EL);
     p.P = distanceAlongSmallCircle(p.H, p.L, 90, 0); 
     p.N = distanceAlongArc(p.H, p.P, () => this.calculations.HN);
+
     /// *** Geometry *** ///
 
     g.meridian = new Equator(p.E);
@@ -104,7 +104,7 @@ export class Proposition13 extends Model {
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
-    gui.addSlider('Declination', this.parameters, 'declination', -23.5, 23.5);
+    gui.addSlider('Declination', this.parameters, 'declination', -this.parameters.obliquity, this.parameters.obliquity);
     gui.addSlider('Time', this.parameters, 'time', 0, 12);
   }
 
