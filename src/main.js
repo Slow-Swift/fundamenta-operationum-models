@@ -2,26 +2,25 @@ import * as THREE from 'three';
 import { CSS2DRenderer, OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Proposition2 } from './models/proposition2';
 import { Proposition14 } from './models/proposition14';
-import GUI from 'lil-gui';
 import { Proposition7 } from './models/proposition7';
 import { Proposition9 } from './models/proposition9';
 import { Proposition34 } from './models/proposition34';
 import { ModelGui } from './core/gui';
 import { Proposition2Animated } from './models/proposition2-animated';
-import 'katex/dist/katex.min.css';
 import { Proposition3 } from './models/proposition3';
 import { Proposition4 } from './models/proposition4';
 import { Proposition5 } from './models/proposition5';
 import { Proposition6 } from './models/proposition6';
 import { Proposition8 } from './models/proposition8';
 import { Proposition11 } from './models/proposition11';
-import { Rising } from './models/rising';
 import { Proposition13 } from './models/proposition13';
 import { Proposition15 } from './models/proposition15';
 import { Proposition16 } from './models/proposition16';
 import { Proposition17 } from './models/proposition17';
 import { Proposition17Equator } from './models/proposition17_equator';
 import { Proposition18 } from './models/proposition18';
+import 'katex/dist/katex.min.css';
+import { Proposition18WithEquator } from './models/proposition18_with_equator';
 
 const settings = window.settings = {
   darkMode: true,
@@ -46,6 +45,7 @@ const models = {
   'Proposition 17': Proposition17,
   'Proposition 17 with Equator': Proposition17Equator,
   'Proposition 18': Proposition18,
+  'Proposition 18 with Equator': Proposition18WithEquator,
   'Proposition 34': Proposition34,
 };
 
