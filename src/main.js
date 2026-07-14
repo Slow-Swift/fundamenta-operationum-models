@@ -21,6 +21,10 @@ import { Proposition17Equator } from './models/proposition17_equator';
 import { Proposition18 } from './models/proposition18';
 import 'katex/dist/katex.min.css';
 import { Proposition18WithEquator } from './models/proposition18_with_equator';
+import { Proposition19 } from './models/proposition19';
+import { Proposition20 } from './models/proposition20';
+import { Proposition21 } from './models/proposition21';
+import { Proposition22 } from './models/proposition22';
 
 const settings = window.settings = {
   darkMode: true,
@@ -46,6 +50,10 @@ const models = {
   'Proposition 17 with Equator': Proposition17Equator,
   'Proposition 18': Proposition18,
   'Proposition 18 with Equator': Proposition18WithEquator,
+  'Proposition 19': Proposition19,
+  'Proposition 20': Proposition20,
+  'Proposition 21': Proposition21,
+  'Proposition 22': Proposition22,
   'Proposition 34': Proposition34,
 };
 

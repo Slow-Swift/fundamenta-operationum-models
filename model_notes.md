@@ -66,4 +66,60 @@ would be and placing E based of off that. (See Proposition 17 with Equator for a
 Finally, for some latitude and longitude combinations there is no case where the selected point on the ecliptic
 crosses the horizon. For this reason I have just restricted the latitude slider so that is never the case.
 
+## Proposition 18
+TODO:
 
+## Proposition 19
+It took me quite a while to understand this and the text has some rather confusing parts so I've
+included detailed notes about my understanding of the problem. The big issue with the model right
+now is the issue of parameters and the way the point altitude parameter jumps around as other
+parameters are moved (See the first section below).
+
+### The parameters
+
+Reggie uses the altitude of the ecliptic on the meridian, the angle of the ecliptic with the 
+meridian, and the altitude of the chosen point on the meridian as parameters. These are confusing
+to use for the model since it isn't clear how one would obtain values for those parameters. Worse
+the allowable range for the altitude of the point is the complement of HK which is indirectly derived
+from the parameters. This means that the range for that slider changes in an unclear fashion based 
+on the other sliders. Furthermore because I restricted sliders to a scale of 0.1 but HK is real you
+usually cannot set the slider for altitude to the theoretical maximum (you can only set it to the closest 0.1).
+
+Should I work out how to calculate this values from latitude, and ecliptic longitude? Will there 
+then be any difference between this and Proposition 18.
+
+## East Point verses Ascendent
+
+Reggie says 
+
+>This is subtracted from two right \[angles\] if the given point is less than 90° from 
+> the east; or it itself is the sought angle
+> if the given point is more than 90° removed from the ascendent.
+
+Here he references both the East point and the ascendent. From this paragraph it seems like 
+this should be the same, however the ascendent is E but E is not the east point of the horizon.
+However, K is always 90 degrees away from E and if L is on the other side of K from E then HLK is
+indeed the sought angle as Reggie says. So it seems that he meant E by both "the east" and "the ascendent"
+as Mark Takken assumed.
+
+However, with the parameter of altitude of the given point, there are always two possibilities for
+the actual point. One within 90 degrees of E and the other more than 90 degrees from E. In particular
+there are often two possibilities in the eastern hemisphere (one on each side of K). In the model I've
+made this makes it impossible to specify a point to the left of K. 
+
+## North and South
+
+Reggie says:
+
+> Indeed all these matters apply when the point of the ecliptic is positioned on the meridian,
+> inclined from the vertex of the head toward the southern region.
+> For in contrast if it were to incline to the north, everything is reversed.
+
+This confused me for a while, but I think vertex of the head is the zenith (H) and if the point of
+the ecliptic is inclined towards the south, then A is south of H (towards B) otherwise it is towards C.
+This allows Reggie to restrict ecliptic angle to < 90 and if you had a case where it was > 90,
+you would flip the entire model and put A between H and C.
+
+## Proposition 21
+There are two possibilities for L. One on each side of the sphere. I have elected to always 
+have it on the east side of the sphere.

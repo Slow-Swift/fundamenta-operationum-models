@@ -1,4 +1,5 @@
 import * as TriangleSolver from "../math/TriangleSolver";
+import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 
 const OBLIQUITY_DEFAULT=23.5;
 
@@ -224,4 +225,70 @@ export function proposition18(eclipticLongitude, meridianDistance, latitude, obl
     const ZKE = proposition16(eclipticLongitude, obliquity);
     const HKE = HKX + ZKE;
     return HKE;
+}
+
+/**
+* Determines the angle formed by a point of the ecliptic with the zenith.
+*
+* @param {number} eclipticAltitude - The altitude of the ecliptic on the southern meridian.
+* @param {number} eclipticAngle - The angle formed by the ecliptic and the meridian | [0,90].
+* @param {number} pointAltitude - The altitude of the point above the horizon. This must be less than
+*   or equal to the maximum altitude of the ecliptic.
+* @returns The angle formed by the point of the ecliptic and the zenith.
+*/
+export function proposition19(eclipticAltitude, eclipticAngle, pointAltitude) {
+    const HK = TriangleSolver.opposite(eclipticAngle, 90 - eclipticAltitude);
+    const HLK = TriangleSolver.angleFromOppositeAndHypotenuse(HK, 90 - pointAltitude);
+    return HLK;
+}
+
+/**
+* Determines the angle formed by a point of the ecliptic with the zenith.
+*
+* @param {number} ascensionDistance - The distance of the point from the ascension.
+* @param {number} altitude - The altitude of the point above the horizon.
+* @returns {number} The angle formed with the zenith.
+*/
+export function proposition20(ascensionDistance, altitude) {
+  const LEM = TriangleSolver.angleFromOppositeAndHypotenuse(altitude, ascensionDistance);
+  const LEH = 90 - LEM;
+  const HLE = asin(sin(LEH) / sin(90 - altitude));
+  const actualHLE = altitude = 0 ? 90 : (altitude > 0 ? 180 - HLE : HLE);
+  return ascensionDistance < 0 ? 180 - actualHLE : actualHLE;
+}
+
+/**
+* Determines the position of the ascendent on the ecliptic given the location of the midheaven
+* and the latitude of the observer.
+*
+* @param {number} midheavenLongitude - The ecliptic longitude of the midheaven.
+* @param {number} latitude - The latitude of the observer.
+* @param {number} [obliquity=OBLIQUITY_DEFAULT] - The obliquity of the ecliptic.
+* @returns {number} The ecliptic longitude of the ascension.
+*/
+export function proposition21(midheavenLongitude, latitude, obliquity=OBLIQUITY_DEFAULT) {
+  const A_declination = proposition2(midheavenLongitude, obliquity);
+  const HAL = proposition16(midheavenLongitude, obliquity);
+  const HA = latitude - A_declination;
+  const AL = HAL > 90 ? 360 - TriangleSolver.adjacent(HAL, HA) : TriangleSolver.adjacent(HAL, HA);
+  const AE = AL > 90 ? AL - 90 : AL + 90;
+  return mod(AE + midheavenLongitude + 180, 360) - 180;
+}
+
+/**
+* Determines the position of the midheaven given the position of the ascendent on the ecliptic and 
+* the latitude of the observer.
+*
+* @param {number} ascendentLongitude - The ecliptic longitude of the ascendent.
+* @param {number} latitude - The latitude of the observer.
+* @param {number} [obliquity=OBLIQUITY_DEFAULT] - The obliquity of the ecliptic.
+* @returns {number} The ecliptic longitude of the midheaven.
+*/
+export function proposition22(ascendentLongitude, latitude, obliquity=OBLIQUITY_DEFAULT) {
+  const E_declination = proposition2(ascendentLongitude, obliquity);
+  const E_ortiveAmplitude = proposition7(E_declination, latitude);
+  const LEM = proposition17(ascendentLongitude, latitude, obliquity);
+  const AL = TriangleSolver.opposite(E_ortiveAmplitude, 90 - LEM);
+  const AE = 90 + AL;
+  return mod(ascendentLongitude - AE + 180, 360) - 180;
 }
