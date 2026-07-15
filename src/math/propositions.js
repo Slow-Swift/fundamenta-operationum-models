@@ -303,7 +303,7 @@ export function proposition22(ascendentLongitude, latitude, obliquity=OBLIQUITY_
 * @returns {number} - The altitude of the sun above the horizon.
 */
 export function proposition23(midheavenAltitude, midheavenDistance, sunDistance) {
-  const KN = TriangleSolver.angleFromOppositeAndHypotenuse(midheavenAltitude, 180-midheavenDistance);
+  let KN = TriangleSolver.angleFromOppositeAndHypotenuse(midheavenAltitude, 180-midheavenDistance);
   if (midheavenDistance % 180 == 0) KN = 90;
   const LM = TriangleSolver.opposite(c.KN, sunDistance);
   return LM;
@@ -364,6 +364,7 @@ export function proposition26(latitude, circleAltitude, hourAngle) {
 * Determines the distance between the intersection of the circle of hours with a longitude circle and 
 * the zenith.
 *
+* Note: Undefined for angle of inclination 0, 180 or latitude 90 (seems to technically work though).
 * Note: I was tired when I wrote this so it may be bad.
 *
 * @param {number} latitude - The latitude of the observer.
@@ -375,7 +376,7 @@ export function proposition27(latitude, inclination, hourAngle) {
     let ZL = TriangleSolver.opposite(inclination, 90 - latitude);
     let AL = TriangleSolver.adjacent(inclination, 90 - latitude);
 
-    if (angleOfInclination > 90 && latitude < 90) {
+    if (inclination > 90 && latitude < 90) {
       ZL = 180 - ZL;
       AL = 180 - AL;
     }
@@ -385,5 +386,5 @@ export function proposition27(latitude, inclination, hourAngle) {
     const ZH = TriangleSolver.hypoteneusFromAdjacent(HZL, ZL);
     const HL = TriangleSolver.opposite(HZL, ZH);
     const AH = AL - HL;
-    return AH;
+    return mod(AH + 180, 360) - 180;
 }

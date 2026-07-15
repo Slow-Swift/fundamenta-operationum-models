@@ -9,6 +9,7 @@ import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
+import { proposition27 } from "../math/propositions";
 
 export class Proposition27 extends Model {
 
@@ -53,7 +54,7 @@ export class Proposition27 extends Model {
       ZAL: new AngleElement(p.A, p.Z, p.L),
       ABE: new RightAngle(p.B, p.A, p.D),
       ALZ: new RightAngle(p.L, p.A, p.Z), 
-      HZD: new AngleElement(p.Z, p.H, p.D),
+      angleOfInclinationHZD: new AngleElement(p.Z, p.H, p.D),
     };
 
     this.createPointGeometries(p);
@@ -69,16 +70,24 @@ export class Proposition27 extends Model {
     c.ZL = TriangleSolver.opposite(p.angleOfInclination, 90 - p.latitude);
     c.AL = TriangleSolver.adjacent(p.angleOfInclination, 90 - p.latitude);
 
-    if (p.angleOfInclination > 90 && p.latitude < 90) {
+    if (p.angleOfInclination > 90) {
       c.ZL = 180 - c.ZL;
       c.AL = 180 - c.AL;
     }
+
+    
 
     c.AZL = TriangleSolver.oppositeAngle(p.angleOfInclination, c.AL);
     c.HZL = p.angleOfInclination < 90 ? c.AZL - AZH : -c.AZL - AZH;
     c.ZH = TriangleSolver.hypoteneusFromAdjacent(c.HZL, c.ZL);
     c.HL = TriangleSolver.opposite(c.HZL, c.ZH);
     c.AH = c.AL - c.HL;
+   
+    if (p.latitude == 90) {
+      c.ZL = 0;
+      c.AL = 0;
+      c.AH = 0;
+    }
   }
 
   setupGui(gui) {

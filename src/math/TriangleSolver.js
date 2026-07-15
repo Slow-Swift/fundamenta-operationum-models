@@ -35,6 +35,17 @@ export function adjacent(angle, hypoteneus) {
 }
 
 /**
+* Determines the hypotenuse of a right triangle given the other two sides.
+*
+* @param {number} sideA - The first side.
+* @param {number} sideB - The second side.
+* @returns {number} - The hypotenuse.
+*/
+export function hypoteneus(sideA, sideB) {
+  return acos(cos(sideA) * cos(sideB));
+}
+
+/**
 * Calculates the third side of a right triangle given the hypoteneus and one of the sides.
 *
 * @param {number} hypoteneus - The hypoteneus of the triangle.

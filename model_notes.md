@@ -123,3 +123,10 @@ you would flip the entire model and put A between H and C.
 ## Proposition 21
 There are two possibilities for L. One on each side of the sphere. I have elected to always 
 have it on the east side of the sphere.
+
+## Proposition 29
+Mark Takken assumes that the parameters are oblique ascension, right ascension, and declination,
+however Reggie seems to imply that the parameters are oblique ascension, and ecliptic longitude,
+from which the right ascension and declination can be determined.
+
+The result is chaotic at 0, 0 and 0, 180 so I don't let the parameters go all the way to those values.
