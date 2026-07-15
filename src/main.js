@@ -25,6 +25,11 @@ import { Proposition19 } from './models/proposition19';
 import { Proposition20 } from './models/proposition20';
 import { Proposition21 } from './models/proposition21';
 import { Proposition22 } from './models/proposition22';
+import { Proposition23 } from './models/proposition23';
+import { Proposition24 } from './models/proposition24';
+import { Proposition25 } from './models/proposition25';
+import { Proposition26 } from './models/proposition26';
+import { Proposition27 } from './models/proposition27';
 
 const settings = window.settings = {
   darkMode: true,
@@ -54,6 +59,11 @@ const models = {
   'Proposition 20': Proposition20,
   'Proposition 21': Proposition21,
   'Proposition 22': Proposition22,
+  'Proposition 23': Proposition23,
+  'Proposition 24': Proposition24,
+  'Proposition 25': Proposition25,
+  'Proposition 26': Proposition26,
+  'Proposition 27': Proposition27,
   'Proposition 34': Proposition34,
 };
 

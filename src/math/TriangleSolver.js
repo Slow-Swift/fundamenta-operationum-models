@@ -1,7 +1,5 @@
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 
-// TODO: Move obliquity and see why it breaks!
-
 /**
  * Calculates the opposite side of a right triangle using an angle and the hypotenuse.
  *
@@ -12,6 +10,7 @@ import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
  * @returns {number} - The length of the opposite side | [-90, 90].
  */
 export function opposite(angle, hypoteneus) {
+  if (hypoteneus == 0) return 0;
   angle = mod(angle, 360);
   const length = asin(sin(angle) * sin(hypoteneus));
   return (angle >= 270 || angle <= 90) ? mod(length+180, 360)-180 : mod(-length, 360)-180;
@@ -27,11 +26,25 @@ export function opposite(angle, hypoteneus) {
  * @returns {number} - The length of the opposite side | [-180, 180].
  */
 export function adjacent(angle, hypoteneus) {
+  if (hypoteneus == 0) return 0;
   angle = mod(angle, 360);
   const opp = opposite(angle, hypoteneus);
   const adj = acos(cos(hypoteneus) / cos(opp)); // Always positive
   const angleSign = (angle >= 270 || angle <= 90) ? 1 : -1;
   return adj * angleSign * Math.sign(hypoteneus);
+}
+
+/**
+* Calculates the third side of a right triangle given the hypoteneus and one of the sides.
+*
+* @param {number} hypoteneus - The hypoteneus of the triangle.
+* @param {number} sideA - The given side.
+* @returns {number} - The third side.
+*/
+export function thirdSide(hypoteneus, sideA) {
+  if (sideA == 0) return hypoteneus;
+  const length = acos(cos(hypoteneus) / cos(sideA));
+  return Math.sign(hypoteneus) * length;
 }
 
 /**

@@ -292,3 +292,98 @@ export function proposition22(ascendentLongitude, latitude, obliquity=OBLIQUITY_
   const AE = 90 + AL;
   return mod(ascendentLongitude - AE + 180, 360) - 180;
 }
+
+/**
+* Determines the altitude of the sun given the altitude of the midheaven and the distance of 
+* the midheaven and the sun from the ascendent.
+*
+* @param {number} midheavenAltitude - The altitude of the midheaven | [-90, 90].
+* @param {number} midheavenDistance - The distance of the midheaven from the ascendent | [0, 180].
+* @param {number} sunDistance - The distance of the sun from the ascendent | [-180, 180].
+* @returns {number} - The altitude of the sun above the horizon.
+*/
+export function proposition23(midheavenAltitude, midheavenDistance, sunDistance) {
+  const KN = TriangleSolver.angleFromOppositeAndHypotenuse(midheavenAltitude, 180-midheavenDistance);
+  if (midheavenDistance % 180 == 0) KN = 90;
+  const LM = TriangleSolver.opposite(c.KN, sunDistance);
+  return LM;
+}
+
+/**
+* Determines the distance to the northern horizon from the intersection of circle of hours with
+* the horizon.
+*
+* Note: Undefined when latitude = 0.
+*
+* @param {number} latitude - The latitude of the observer.
+* @param {number} hourAngle - The angle at the north pole between the meridian and the circle of hours.
+* @returns {number} - The distance from the intersection to the north point of the horizon.
+*/
+export function proposition24(latitude, hourAngle) {
+  const length = 90 - TriangleSolver.hypoteneusFromAdjacent(90 - latitude, 90 - hourAngle);
+  return mod(length + 180, 360) - 180; 
+}
+
+/**
+* Determines the distance to the zenith from the intersection of the circle of hours with the 
+* eastern circle.
+*
+* Note: Undefined when latitude = 90.
+*
+* @param {number} latitude - The latitude of the observer.
+* @param {number} hourAngle - The angle at the north pole between the meridian and the circle of hours.
+* @returns {number} - The distance from the intersection to the zenith.
+*/
+export function proposition25(latitude, hourAngle) {
+  const ZH = TriangleSolver.hypoteneusFromAdjacent(180 - hourAngle, 90 - latitude);
+  const AH = TriangleSolver.opposite(180 - hourAngle, ZH);
+  return AH;
+}
+
+/**
+* Determines the distance between an intersiotion of the circle of hours with a great circle 
+* perpendicular to the meridian and the intersection of that circle with the meridian.
+*
+* Note: Undefined when the great circle intersects the poles.
+*
+* @param {number} latitude - The latitude of the observer.
+* @param {nubmer} circleAltitude - The altitude of the intersection of the circle with the meridian.
+* @param {number} hourAngle - The angle at the north pole between the meridian and the circle of hours.
+* @returns {number} - The distance between the intersection of the great circle with the circle of 
+*   hours and the intersection with the meridian.
+*/
+export function proposition26(latitude, circleAltitude, hourAngle) {
+  const AZ = circleAltitude - latitude;
+  const ZH = TriangleSolver.hypoteneusFromAdjacent(180 - hourAngle, AZ);
+  const AH = TriangleSolver.opposite(180 - hourAngle, ZH);
+  return AZ < 0  ? mod(360 + AH) - 180 : AH;
+}
+
+
+/**
+* Determines the distance between the intersection of the circle of hours with a longitude circle and 
+* the zenith.
+*
+* Note: I was tired when I wrote this so it may be bad.
+*
+* @param {number} latitude - The latitude of the observer.
+* @param {number} inclination - The angle between the circle of latitude and the meridian.
+* @param {number} hourAngle - The angle at the north pole between the meridian and the circle of hours.
+* @returns {number} The distance between the intersection and the zenith.
+*/
+export function proposition27(latitude, inclination, hourAngle) {
+    let ZL = TriangleSolver.opposite(inclination, 90 - latitude);
+    let AL = TriangleSolver.adjacent(inclination, 90 - latitude);
+
+    if (angleOfInclination > 90 && latitude < 90) {
+      ZL = 180 - ZL;
+      AL = 180 - AL;
+    }
+
+    const AZL = TriangleSolver.oppositeAngle(inclination, AL);
+    const HZL = inclination < 90 ? AZL - (180 - hourAngle) : -AZL - (180 - hourAngle);
+    const ZH = TriangleSolver.hypoteneusFromAdjacent(HZL, ZL);
+    const HL = TriangleSolver.opposite(HZL, ZH);
+    const AH = AL - HL;
+    return AH;
+}
