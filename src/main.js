@@ -32,6 +32,9 @@ import { Proposition26 } from './models/proposition26';
 import { Proposition27 } from './models/proposition27';
 import { Proposition28 } from './models/proposition28';
 import { Proposition29 } from './models/proposition29';
+import { Proposition31 } from './models/proposition31';
+import { Proposition32 } from './models/proposition32';
+import { Playground } from './models/playground';
 
 const settings = window.settings = {
   darkMode: true,
@@ -68,7 +71,10 @@ const models = {
   'Proposition 27': Proposition27,
   'Proposition 28': Proposition28,
   'Proposition 29': Proposition29,
+  'Proposition 31': Proposition31,
+  'Proposition 32': Proposition32,
   'Proposition 34': Proposition34,
+  'Playground': Playground,
 };
 
 settings.model = models[localStorage.getItem('Model') ?? 'Proposition 2'];

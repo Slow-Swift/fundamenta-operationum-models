@@ -9,16 +9,16 @@ import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
-import { proposition2, proposition5 } from "../math/propositions";
+import { proposition16, proposition2, proposition5 } from "../math/propositions";
 
-export class Proposition29 extends Model {
+export class Playground extends Model {
 
   constructor() {
     super();
     this.variables = {
-      obliqueAscension: 50,
-      eclipticLongitude: 60,
-      declination: 10,
+      latitude: 45,
+      time: 8,
+      eclipticLongitude: 0,
       obliquity: 23.5,
     };
   }
@@ -32,23 +32,23 @@ export class Proposition29 extends Model {
       horizon: new Equator(Point(0, 90)),
     };
 
+    // Horizon
     p.E = Point(0,0);
-    p.B = Point(-90, 0);
-    p.D = Point(90, 0);
-    p.H = Point(() => v.EH, 0);
+    p.W = Point(180, 0);
+    p.S = Point(-90, 0);
+    p.N = Point(90, 0);
+
     p.Z = Point(90, () => v.latitude);
-    p.A = Point(-90, () => 90 - v.latitude);
-    p.C = Point(90, () => v.latitude - 90);
-    p.L = distanceAlongArc(p.E, p.A, () => v.obliqueAscension);
-    p.K = distanceAlongArc(p.E, p.C, () => v.EK);
+    p.X = Point(-90, () => -v.latitude);
+    p.H = Point(0, 90);
+    p.V = distanceAlongSmallCircle(p.Z, p.E, () => -v.time * 180 / 12 + 90, 0);
+    p.V_c = distanceAlongSmallCircle(p.Z, p.E, () => -v.time * 180 / 12 + 180, 0);
+    p.V_p = distanceAlongSmallCircle(p.V, p.V_c, () => v.obliquity, 0);
+    p.G = distanceAlongArc(p.V, p.V_p, () => v.eclipticLongitude);
 
     // *** Geometry ***
-    g.equator = new Arc(p.E, p.C, {length: 360});
-    g.ZK = new Arc(p.Z, p.K);
-    g.HL = new Arc(p.L, p.H);
-
-    g.HLE = new AngleElement(p.L, p.H, p.E);
-    g.EKH = new AngleElement(p.K, p.H, p.E);
+    g.equator = new Equator(p.Z);
+    g.ecliptic = new Arc(p.V, p.V_p, { length: 360 });
 
     this.createPointGeometries(p);
   }
@@ -56,20 +56,12 @@ export class Proposition29 extends Model {
   updateCalculations() {
     const p = this.points;
     const v = this.variables;
-
-    v.declination = proposition2(v.eclipticLongitude, v.obliquity);
-    v.rightAscension = proposition5(v.eclipticLongitude, v.obliquity);
-
-    v.EK = v.rightAscension - v.obliqueAscension;
-    v.EH = TriangleSolver.hypoteneus(v.EK, v.declination);
-    v.HEK = TriangleSolver.angleFromOppositeAndHypotenuse(v.declination, v.EH);
-    if (v.EK < 0) v.HEK = 180 - v.HEK;
-    v.latitude = 90 - v.HEK;
   }
 
   setupGui(gui) {
-    gui.addSlider('Oblique Ascension', this.variables, 'obliqueAscension', 0.1, 90);
-    gui.addSlider('Ecliptic Longitude', this.variables, 'eclipticLongitude', 0.1, 179);
+    gui.addSlider('Latitude', this.variables, 'latitude', -90, 90);
+    gui.addSlider('Time', this.variables, 'time', 0, 24);
+    gui.addSlider('Ecliptic Longitude', this.variables, 'eclipticLongitude', -180, 180);
   }
 
 }

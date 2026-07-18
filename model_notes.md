@@ -130,3 +130,44 @@ however Reggie seems to imply that the parameters are oblique ascension, and ecl
 from which the right ascension and declination can be determined.
 
 The result is chaotic at 0, 0 and 0, 180 so I don't let the parameters go all the way to those values.
+
+## Proposition 30
+
+This problem is quite confusing.
+Mark Takken assumes that we know both the oblique ascension and right ascension of H but if we know 
+the right ascension then we would be able to determine the ecliptic longitude of H and the problem
+reduces to P29. So we must not know the right ascension of H.
+
+Reggie says we are given an arc of the ecliptic beginning at a point other than the intersection 
+with the equator together with its oblique ascension. 
+I would interpret this as giving the oblique ascension of H together with the length of the arc of the 
+ecliptic HL.
+
+Reggie then notes that the ecliptic arc starts at H and ends at L. His diagram puts L on the 
+horizon (unless BED is not the horizon in this diagram), but this would put HL (an arc of the ecliptic)
+on the horizon which can only occur for latitude = 66.5.
+
+But then Reggie says that KM is the difference between the oblique ascension (which was given) and 
+the right ascension of the arc. As noted above I don't think this right ascension can be given but I
+don't understand how Reggie's statement makes any sense. Even if we were given the right ascension of 
+H the difference between the given oblique ascension and the right ascension would be EK not KM. 
+If instead we had the right ascension of L this would give EM. The only way it makes sense is if the 
+diagram is understood differently and the horizon actually passes through KL and we are given the oblique
+ascension of L instead of H, but even this doesn't make much sense.
+
+Given the length HL we could calculate the right ascension of the arc assuming H was at the equinox.
+Maybe combining this with the oblique ascension somehow gives KM.
+
+There is then an error in translation. "sinus arcus ZL complementi declinatis maioris" is translated 
+as "the cosine of arc ZL, the maximum declination" but should instead be "the sine of arc ZL, the complement
+of the maximum declination". Also it is possible that the "maximum declination" should actually be 
+the "larger declination" as if it is the maximum possible declination (23.5) then that fixes L, and 
+we can then easily work out the ecliptic longitude of H and are back to proposition 29. This is further 
+reinforced by Reggie later referring to the lesser declination "HK".
+
+I am also not sure how either of these declinations may be calculated without more easily being 
+able to use P29.
+
+Also what! He says there is no problem if ark ZK exceeds a quadrant. That implies that AEC is not the
+equator. What is happening??
+

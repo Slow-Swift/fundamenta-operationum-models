@@ -153,3 +153,28 @@ export function hypoteneusFromAdjacent(angle, adjacent) {
 export function angleLawOfSines(sideA, sideB, angleA) {
   return asin(sin(angleA) * sin(sideB) / sin(sideA));
 }
+
+export function solveRightTriangle({
+  hypoteneus=undefined, 
+  sideA=undefined, 
+  sideB=undefined,
+  angleA=undefined,
+  angleB=undefined,
+  negativeSideLengths=false,
+}) {
+  if (hypoteneus == undefined) {
+    if (sideA != undefined && sideB != undefined) hypoteneus = acos(cos(sideA) * cos(sideB)); // Spherical Pythagoras
+  }
+
+  if (sideA == undefined) {
+    if (hypoteneus != undefined && angleA != undefined) sideA = Math.abs(asin(sin(angleA) * sin(hypoteneus)));
+  }
+
+  return {
+    hypoteneus: hypoteneus,
+    sideA: sideA,
+    sideB: sideB,
+    angleA: angleA,
+    angleB: angleB,
+  };
+}
