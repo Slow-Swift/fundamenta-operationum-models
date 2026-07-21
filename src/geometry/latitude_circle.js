@@ -12,7 +12,11 @@ export class LatitudeCircle extends LineElement {
   }
 
   generatePoints() {
-    const points = latitudeArc(this.pole, this.latitude, this.start, this.length);
+    const pole = typeof(this.pole) == 'function' ? this.pole() : this.pole;
+    const latitude = typeof(this.latitude) == 'function' ? this.latitude() : this.latitude;
+    const start = typeof(this.start) == 'function' ? this.start() : this.start;
+    const length = typeof(this.length) == 'function' ? this.length() : this.length;
+    const points = latitudeArc(pole, latitude, start, length);
     return points;
   }
 }

@@ -171,3 +171,34 @@ able to use P29.
 Also what! He says there is no problem if ark ZK exceeds a quadrant. That implies that AEC is not the
 equator. What is happening??
 
+## Proposition 31
+The set of valid values for ortive amplitude depends on the angle of intersection with the horizon
+which depends on ecliptic longitude of the midheaven. To keep things simple I've restricted the 
+ecliptic longitude to keep the angle of intersection with the horizon less than 90. This means that
+AE > 90 and so the minimum ortive amplitude is 90 - angle formed with the midheaven.
+
+## Proposition 32
+Similar to last problem I've restricted the angle with the midheaven to less than 90 for simplicity.
+Also while the proposition takes the ecliptic longitude of E as a parameter and uses it to calculate AE
+I made AE the parameter because 0 <= AE <= 180 so it's simpler to make AE the parameter.
+Also because the angle with the ecliptic is restricted to <= 90, 90 <= AE.
+
+## Proposition 33
+
+I've made a model of what I think is going on but I don't really understand the proposition.
+What is the goal here? Is it as Mark Takken shows, simply to calculate HZK? But I don't really
+understand the paragraphs leading up to where Reggie says it is useful to calculate HZK.
+
+The translation refers to "a" vertical circle. Mark Takken assumes that this is "the" circle passing
+through the east point of the horizon and the zenith. Reggie also seems to assume this otherwise 
+proposition 14 would not apply.
+
+I don't know what this means:
+> But the given arc of the ecliptic simultaneously traverses through both the right horizon and the
+> vertical circle, since its termini coincide with the same point as the vertical circle.
+
+I also can't follow the next few paragraphs, in part because it's unclear what follows from previous
+reasoning and when a new case starts.
+
+I also don't fully understand what comes later with the alternate explanation. Some of it sounds
+like extra, mini propositions because of his language "If ... to investigate the ...". 

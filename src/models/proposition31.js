@@ -41,6 +41,7 @@ export class Proposition31 extends Model {
     p.A_c = distanceAlongSmallCircle(p.A, p.A_p, () => - v.ZAE, 0);
     p.Z = Point(90, () => v.ZD);
     p.V = distanceAlongArc(p.A, p.A_c, () => v.midheavenLongitude);
+    p.O = Point(-90, () => 90 - v.ZD);
 
     // *** Geometry ***
     g.ecliptic = new Arc(p.A, p.A_c, {length: 360});
