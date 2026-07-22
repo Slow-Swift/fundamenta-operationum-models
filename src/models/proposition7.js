@@ -41,7 +41,7 @@ export class Proposition7 extends Model {
     };
 
 
-    this.geometry = {
+    const g = this.geometry = {
       sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
       horizon: new Equator(Point(0, 90)),
       equator: new Equator(p.Z),
@@ -67,6 +67,7 @@ export class Proposition7 extends Model {
   }
 
   updateCalculations() {
+    const g = this.geometry;
     this.declinationSlider?.setRange(-Math.min(90-this.parameters.latitude, 23.5), Math.min(90-this.parameters.latitude, 23.5));
 
     this.points.Z.copy(Point(-90, -this.parameters.latitude));
@@ -75,7 +76,7 @@ export class Proposition7 extends Model {
 
     
     const ortiveAmplitude = TriangleSolver.hypoteneusFromOpposite(90 - this.parameters.latitude, this.parameters.declination); 
-    this.points.H.copy(Point(-ortiveAmplitude, 0));
+    this.points.H.copy(Point(Number.isNaN(ortiveAmplitude) ? 0 : -ortiveAmplitude, 0));
     this.points.K.copy(distanceAlongArc(this.points.Z, this.points.H, 90));
     
     this.geometry.ortiveAmplitudeLabel.text = Math.round(ortiveAmplitude*10)/10;
@@ -88,6 +89,7 @@ export class Proposition7 extends Model {
     this.geometry.latLabel.position = distanceAlongArc(this.points.Z, this.points.B, this.parameters.latitude/2);
     this.geometry.latComplement.text = round(90 - this.parameters.latitude, 1);
     this.geometry.latComplement.position = distanceAlongArc(this.points.B, this.points.A, (90 - this.parameters.latitude) / 2);
+    this.setGeometryVisibility(this.parameters.latitude < 90, [g.K, g.H, g.angle_K, g.ZK, g.ZH]);
   }
 
   setupGui(gui) {

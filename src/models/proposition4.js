@@ -23,6 +23,7 @@ export class Proposition4 extends Model {
   }
 
   createModel() {
+    const v = this.parameters;
     const p = this.points = {
       E:  Point(0, 0), // Equator Centre
       A:  Point(90, 0), // Equator Horizon Right
@@ -48,7 +49,7 @@ export class Proposition4 extends Model {
       angleA: new RightAngle(p.A, p.E, p.F),
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
       angleH: new RightAngle(p.H, p.E, p.G),
-      angleE: new AngleElement(p.E, p.G, p.H),
+      angleE: new AngleElement(p.E, () => Math.abs(v.g_angle) < 90 ? p.G : v.g_angle < 0 ? p.D : p.B, () => Math.abs(v.g_angle) < 90 ? p.H : v.g_angle < 0 ? p.C : p.A),
       g_angleLabel: new Label(),
     };
 
@@ -72,7 +73,7 @@ export class Proposition4 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Lunar Longitude', this.parameters, 'g_angle', -179, 179);
+    gui.addSlider('Lunar Longitude', this.parameters, 'g_angle', -180, 180);
   }
 
 }

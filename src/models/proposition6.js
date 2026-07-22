@@ -26,6 +26,7 @@ export class Proposition6 extends Model {
   }
 
   createModel() {
+    const v = this.parameters;
     const p = this.points = {
       E:  Point(0, 0), // Equator Centre
       A:  Point(90, 0), // Equator Horizon Right
@@ -51,7 +52,7 @@ export class Proposition6 extends Model {
       angleA: new RightAngle(p.A, p.E, p.F),
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
       angleH: new RightAngle(p.H, p.E, p.G),
-      angleE: new AngleElement(p.E, p.G, p.H),
+      angleE: new AngleElement(p.E, () => Math.abs(v.right_ascension) < 90 ? p.G : v.right_ascension < 0 ? p.D : p.B, () => Math.abs(v.right_ascension) < 90 ? p.H() : v.right_ascension < 0 ? p.C : p.A),
       angleG: new AngleElement(p.G, p.H, p.E),
 
       labelEG: new Label(),
@@ -79,7 +80,7 @@ export class Proposition6 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Right Ascension', this.parameters, 'right_ascension', -179, 179);
+    gui.addSlider('Right Ascension', this.parameters, 'right_ascension', -180, 180);
   }
 
 }

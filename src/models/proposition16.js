@@ -24,6 +24,7 @@ export class Proposition16 extends Model {
 
   createModel() {
     const c = this.calculations;
+    const v = this.parameters;
 
     const p = this.points = {
       E: Point(0, 0),   // Equator Centre
@@ -49,7 +50,7 @@ export class Proposition16 extends Model {
       HL: new Arc(p.H, p.L),
 
       angle_L: new RightAngle(p.L, p.K, p.E),
-      angle_B: new RightAngle(p.B, p.A, p.L),
+      angle_B: new RightAngle(p.B, p.A, () => v.ecliptic_longitude < 180 ? p.L() : p.E),
       angle_A: new RightAngle(p.A, p.H, p.K),
       angleK: new AngleElement(p.K, p.L, p.E),
     };
@@ -63,7 +64,7 @@ export class Proposition16 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Ecliptic Longitude', this.parameters, 'ecliptic_longitude', 90, 270);
+    gui.addSlider('Ecliptic Longitude', this.parameters, 'ecliptic_longitude', 0, 360);
   }
 
 }

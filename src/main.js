@@ -38,6 +38,7 @@ import { Playground } from './models/playground';
 import { Proposition33 } from './models/proposition33';
 import { Proposition34Extra } from './models/proposition34Extra';
 import { Proposition35 } from './models/proposition35';
+import { Proposition36 } from './models/proposition36';
 
 const settings = window.settings = {
   darkMode: true,
@@ -80,6 +81,7 @@ const models = {
   'Proposition 34': Proposition34,
   'Proposition 34 Extra': Proposition34Extra,
   'Proposition 35': Proposition35,
+  'Proposition 36': Proposition36,
   'Playground': Playground,
 };
 

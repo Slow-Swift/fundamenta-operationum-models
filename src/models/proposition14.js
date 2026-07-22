@@ -67,10 +67,12 @@ export class Proposition14 extends Model {
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     this.declinationSlider?.setRange(-Math.min(p.latitude, 23.5), Math.min(p.latitude, 23.5));
 
-    c.altitude = p.latitude == 0 ? 90 : asin(sin(p.declination) / sin(p.latitude));
+    c.altitude = asin(sin(p.declination) / sin(p.latitude));
+    this.setGeometryVisibility(p.latitude != 0, [g.O, g.M, g.altitudeLabel]);
   }
 
   setupGui(gui) {

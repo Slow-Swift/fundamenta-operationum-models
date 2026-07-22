@@ -23,6 +23,7 @@ export class Proposition2 extends Model {
   }
 
   createModel() {
+    const v = this.parameters;
     const p = this.points = {
       E:  Point(0, 0), // Equator Centre
       A:  Point(90, 0), // Equator Horizon Right
@@ -48,7 +49,7 @@ export class Proposition2 extends Model {
       angleA: new RightAngle(p.A, p.E, p.F),
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
       angleH: new RightAngle(p.H, p.E, p.G),
-      angleE: new AngleElement(p.E, p.G, p.H),
+      angleE: new AngleElement(p.E, () => Math.abs(v.g_angle) < 90 ? p.G : v.g_angle < 0 ? p.D : p.B, () => Math.abs(v.g_angle) < 90 ? p.H : v.g_angle < 0 ? p.C : p.A),
       g_angleLabel: new Label(),
     };
 
@@ -63,7 +64,6 @@ export class Proposition2 extends Model {
 
     this.geometry.FG.point2 = this.parameters.g_angle > 0 ? this.points.H : this.points.G;
 
-    
     const declination = TriangleSolver.opposite(this.parameters.obliquity, this.parameters.g_angle); 
     const decLabelPos = distanceAlongArc(this.points.G, this.points.H, Math.abs(declination) / 2);
     this.geometry.declinationLabel.position = decLabelPos;
@@ -74,7 +74,7 @@ export class Proposition2 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Ecliptic Longitude', this.parameters, 'g_angle', -179, 179);
+    gui.addSlider('Ecliptic Longitude', this.parameters, 'g_angle', -180, 180);
   }
 
 }

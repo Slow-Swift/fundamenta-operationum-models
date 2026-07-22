@@ -63,7 +63,7 @@ export class Proposition24 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Solar Time', this.parameters, 'time', 12);
+    gui.addSlider('Solar Time', this.parameters, 'time', 0, 12);
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
   }
 
