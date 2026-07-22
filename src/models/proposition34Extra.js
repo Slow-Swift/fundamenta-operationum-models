@@ -10,7 +10,7 @@ import * as TriangleSolver from "../math/TriangleSolver";
 import { RightAngle } from "../geometry/right_angle";
 
 
-export class Proposition34 extends Model {
+export class Proposition34Extra extends Model {
 
   constructor() {
     super();
@@ -81,7 +81,6 @@ export class Proposition34 extends Model {
     g.ecliptic = new Equator(p.E_p, { thickness: 2, darkColor: 0x0000ff });
 
     this.createPointGeometries(p);
-    this.setGeometryVisibility(false, [g.ecliptic, g.tHorizon, g.tMeridian, g.E_p]);
   }
 
   updateCalculations() {
@@ -109,7 +108,7 @@ export class Proposition34 extends Model {
     this.lat_x_slider = gui.addSlider('Latitude X', this.variables, 'latitude_1', 0, 90);
     this.lat_t_slider = gui.addSlider('Latitude T', this.variables, 'latitude_2', 0, 90);
     this.lon_slider = gui.addSlider('Longitude', this.variables, 'longitude', -180, 180);
-    // gui.addSlider('Time', this.variables, 'time', 0, 24);
+    gui.addSlider('Time', this.variables, 'time', 0, 24);
   }
 
 }

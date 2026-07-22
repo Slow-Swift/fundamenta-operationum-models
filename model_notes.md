@@ -202,3 +202,41 @@ reasoning and when a new case starts.
 
 I also don't fully understand what comes later with the alternate explanation. Some of it sounds
 like extra, mini propositions because of his language "If ... to investigate the ...". 
+
+## Proposition 34
+
+This whole argument depends on X being outside the arctic circle and also assumes that T is outside 
+the arctic circle. I feel like I understood why this was guaranteed at some point but it seems 
+like a point can be inside the arctic circle and still have an ascendant at some time of day
+and also share that ascendant with another point. Perhaps my understanding of ascendant is wrong
+but I think it is just the point of the ecliptic intersecting the eastern horizon. For example
+if X and T have the same longitude, then their horizons will intersect at their eastern points. 
+The ecliptic will intersect this point twice a day so they share an ascendant twice a day.
+
+Reggie explains why the zenith of the second region must be below angle HXM but does not demonstrate
+why the zenith must be outside the arctic circle. Mark Takken seems to assume that only regions 
+outside the arctic circle can share an ascendant, however this is not the case. Perhaps Reggie is 
+saying that it is too complicated to explain:
+
+> The same might be said concerning those regions which have their own vertices within the sides
+> of angle HXM, although it varies more in these cases, since this whole problem is multifaceted,
+> enough that a complete articulation would require an entire column. Therefore let us focus our 
+> attention on those regions whose vertices lie in the space enclosed by the two arcs touching the 
+> Arctic circle, and the arc of the Arctic circle itself, lying between their points of contact.
+
+For now I've let T be placed anywhere with a higher latitude than X. Even inside the arctic circle
+and outside of angle MXH. If we later want to constrain it to be outside the arctic circle, 
+that is easy. It would be harder however to constrain it to remain within MXH because the longitude 
+parameter controls the angle of T around L, not around X. 
+
+For now, I've drawn V (the point of shared ascension) at the intersection of the two horizons even
+if they cannot have a shared ascension. If T is outside MXH there is no shared ascension. If 
+T is past K, then the ascension for X will be a descension for T.
+
+## Proposition 35
+
+I combined all variations and cases into one model. 
+It should maybe be noted that often the model looks very different from Reggies diagrams. 
+For example, in case 2 when the distance to the meridian is greater than 90, most sets of parameters
+have H to the right of O (Or possibly very far left) instead of to the left as shown in Reggie's diagram. 
+This model just has a lot of variation based on the parameters, but the math still works.
