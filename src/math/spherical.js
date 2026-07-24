@@ -23,6 +23,19 @@ export function Point(lat=0, lon=0, visible=true) {
   );
 }
 
+export function pole(point1, point2) {
+  if (typeof point1 === 'function' || typeof point2 === 'function') {
+    return function() {
+      const evalP1 = typeof point1 === 'function' ? point1() : point1;
+      const evalP2 = typeof point2 === 'function' ? point2() : point2;
+      return pole(evalP1, evalP2);
+    };
+  }
+  
+  const u = point1.clone().normalize();
+  return u.clone().cross(point2).normalize();
+}
+
 export function UpdatePoint(point, lat, lon) {
   point.x = Math.sin(lat) * Math.cos(lon);
   point.y = Math.sin(lon);

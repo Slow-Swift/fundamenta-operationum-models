@@ -11,15 +11,13 @@ import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
 import { proposition14, proposition16, proposition2, proposition5 } from "../math/propositions";
 
-export class Proposition36 extends Model {
+export class Proposition37 extends Model {
 
   constructor() {
     super();
     this.variables = {
       latitude: 40,
-      elevation: 20,
-      meridianDistance: 90,
-      declination: 20,
+      elevation: 60,
       obliquity: 23.5,
     };
   }
@@ -34,26 +32,29 @@ export class Proposition36 extends Model {
     };
 
     p.X = Point(0, 90);
+    p.V = Point(0, -90);
     p.E = Point(0,0);
     p.B = Point(-90, 0);
     p.D = Point(90, 0);
     p.A = Point(-90, () => 90 - v.latitude);
     p.C = Point(90, () => v.latitude - 90);
     p.Z = Point(90, () => v.latitude);
-    p.O_p = Point(0, () => 90 - v.ZDO);
-    p.H = distanceAlongArc(p.D, p.O_p, () => v.DH);
-    p.Q = distanceAlongArc(p.C, p.E, () => v.DZH);
     p.T = Point(-90, () => -v.latitude);
+
+    p.K = Point(0, () => 90 - v.elevation);
+
+    p.H = distanceAlongArc(p.D, p.K, () => v.DH);
     p.O = distanceAlongArc(p.E, p.A, () => 90 - v.AO);
 
     // *** Geometry ***
     g.equator = new Equator(p.Z);
-    g.BOD = new Arc(p.B, p.O_p, {length: 360});
-    g.ZQ = new Arc(p.Z, p.Q);
+    g.BOD = new Arc(p.B, p.K, {length: 360});
+    g.XK = new Arc(p.X, p.E, {length: 360});
+    g.ZH = new Arc(p.Z, p.H);
     g.ZHD = new RightAngle(p.H, p.Z, p.D);
 
     this.createPointGeometries(p);
-    this.setGeometryVisibility(false, [g.O_p, g.T, g.X]);
+    this.setGeometryVisibility(false, [g.T]);
   }
  
   updateCalculations() {
@@ -61,17 +62,14 @@ export class Proposition36 extends Model {
     const v = this.variables;
     const g = this.geometry;
 
-    this.elevationSlider?.setRange(0, v.latitude);
-
-    v.ZDO = TriangleSolver.angleFromOppositeAndHypotenuse(v.elevation, v.latitude);
-    v.DH = TriangleSolver.adjacent(v.ZDO, v.latitude);
-    v.DZH = TriangleSolver.oppositeAngle(v.ZDO, v.DH);
-    v.AO = acos(cos(v.ZDO) / cos(v.elevation));
+    v.ZH = TriangleSolver.opposite(v.elevation, v.latitude);
+    v.DH = TriangleSolver.adjacent(v.elevation, v.latitude);
+    v.AO = acos(cos(v.elevation) / cos(v.ZH));
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
-    this.elevationSlider = gui.addSlider('Pole Elevation', this.variables, 'elevation', 0, 90);
+    this.elevationSlider = gui.addSlider('Zenith Elevation', this.variables, 'elevation', 0, 90);
   }
 
 }

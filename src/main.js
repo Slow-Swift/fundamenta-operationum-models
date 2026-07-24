@@ -39,6 +39,12 @@ import { Proposition33 } from './models/proposition33';
 import { Proposition34Extra } from './models/proposition34Extra';
 import { Proposition35 } from './models/proposition35';
 import { Proposition36 } from './models/proposition36';
+import { Proposition37 } from './models/proposition37';
+import { Proposition38 } from './models/proposition38';
+import { Proposition39 } from './models/proposition39';
+import { Proposition40 } from './models/proposition40';
+import { Proposition42 } from './models/proposition42';
+import { Proposition43 } from './models/proposition43';
 
 const settings = window.settings = {
   darkMode: true,
@@ -82,6 +88,12 @@ const models = {
   'Proposition 34 Extra': Proposition34Extra,
   'Proposition 35': Proposition35,
   'Proposition 36': Proposition36,
+  'Proposition 37': Proposition37,
+  'Proposition 38': Proposition38,
+  'Proposition 39': Proposition39,
+  'Proposition 40': Proposition40,
+  'Proposition 42': Proposition42,
+  'Proposition 43': Proposition43,
   'Playground': Playground,
 };
 

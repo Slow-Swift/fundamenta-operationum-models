@@ -24,6 +24,7 @@ export class RightAngle extends LineElement {
     const rightDst = Math.abs(acos(center.clone().dot(rightPoint)));
     const distance = Math.min(7, leftDst, rightDst)/2;
 
+    if (leftDst == 180 || rightDst == 180) return [[0,0,0]];
     if (distance < 0.02) {
       return [[0,0,0]];
     }
