@@ -54,7 +54,7 @@ export function hypoteneus(sideA, sideB) {
 */
 export function thirdSide(hypoteneus, sideA) {
   if (sideA == 0) return hypoteneus;
-  const length = acos(cos(hypoteneus) / cos(sideA));
+  const length = acos(cos(hypoteneus) / cos(sideA));tria
   return Math.sign(hypoteneus) * length;
 }
 

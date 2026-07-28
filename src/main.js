@@ -45,6 +45,8 @@ import { Proposition39 } from './models/proposition39';
 import { Proposition40 } from './models/proposition40';
 import { Proposition42 } from './models/proposition42';
 import { Proposition43 } from './models/proposition43';
+import { Proposition44 } from './models/proposition44';
+import { Proposition45 } from './models/proposition45';
 
 const settings = window.settings = {
   darkMode: true,
@@ -94,6 +96,8 @@ const models = {
   'Proposition 40': Proposition40,
   'Proposition 42': Proposition42,
   'Proposition 43': Proposition43,
+  'Proposition 44': Proposition44,
+  'Proposition 45': Proposition45,
   'Playground': Playground,
 };
 
