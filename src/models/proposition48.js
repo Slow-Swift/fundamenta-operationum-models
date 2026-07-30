@@ -9,13 +9,15 @@ import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
-import { proposition14, proposition16, proposition2, proposition5 } from "../math/propositions";
+import { proposition14, proposition16, proposition2, proposition5, proposition6 } from "../math/propositions";
 
-export class Proposition45 extends Model {
+export class Proposition48 extends Model {
 
   constructor() {
     super();
     this.variables = {
+      declination: 40,
+      midheavenLongitude: 160,
       starLongitude: 150,
       starLatitude: 20,
       obliquity: 23.5,
@@ -32,6 +34,7 @@ export class Proposition45 extends Model {
     };
 
     p.Z = Point(0,90);
+    p.Y = Point(0, -90);
     p.B = Point(-90, 0);
     p.D = Point(90, 0);
     p.E = Point(0,0);
@@ -39,12 +42,16 @@ export class Proposition45 extends Model {
     p.T = Point(-90, -90 + v.obliquity);
     p.A = Point(-90, v.obliquity);
     p.C = Point(90, -v.obliquity);
-    p.H = distanceAlongArc(p.A, p.E, () => v.starLongitude - 90);
-    p.O = distanceAlongArc(p.H, p.X, () => v.starLatitude);
-    p.N = Point(-90, () => 90 - v.XN + v.obliquity);
+    p.K = distanceAlongArc(p.A, p.E, () => v.midheavenLongitude - 90);
+    p.M = distanceAlongArc(p.Z, p.K, 90);
+    p.O = distanceAlongArc(p.M, p.Z, () => v.declination);
+    p.H = distanceAlongArc(p.A, p.E, () => v.AH); 
+    p.N = Point(-90, () => 90 - v.NZ);
     p.L = Point(() => -90 + v.BL, 0);
-    p.M = Point(() => -90 + v.AZO, 0);
-    p.K = distanceAlongArc(p.Z, p.M, () => v.ZK);
+    p.S = Point(0, () => 90 - v.ZS);
+    p.Q = distanceAlongArc(p.Y, p.M, () => v.YQ);
+    p.P = distanceAlongArc(p.C, p.E, () => v.midheavenLongitude - 90);
+
     // *** Geometry ***
     g.ecliptic = new Equator(p.X);
     g.XH = new Arc(p.X, p.H);
@@ -53,9 +60,14 @@ export class Proposition45 extends Model {
     g.ZM = new Arc(p.Z, p.M);
     g.OM = new Arc(p.O, p.M);
     g.MK = new Arc(p.M, p.K);
+    g.ZY = new Arc(p.Z, p.E, {length: 180});
+    g.YM = new Arc(p.Y, p.M);
+    g.XT = new Arc(p.X, p.E, { length: 180});
+    g.XP = new Arc(p.X, p.P, { length: 180});
 
     g.HNO = new RightAngle(p.N, p.X, p.O);
     g.KME = new RightAngle(p.M, p.K, p.E);
+    g.OHK = new RightAngle(p.H, p.O, p.K);
 
     this.createPointGeometries(p);
   }
@@ -65,26 +77,24 @@ export class Proposition45 extends Model {
     const v = this.variables;
     const g = this.geometry;
 
-    v.NXH = v.starLongitude - 90;
-    v.ON = TriangleSolver.opposite(v.NXH, 90 - v.starLatitude);
-    v.XN = TriangleSolver.adjacent(v.NXH, 90 - v.starLatitude);
-    if (v.NXH > 90) v.XN = mod(360 - v.XN, 360) - 180;
-    v.HL = TriangleSolver.adjacent(v.NXH, v.obliquity);
-    if (v.NXH > 90) v.HL = 180 - v.HL;
-    v.BL = TriangleSolver.opposite(v.NXH, 90 + v.HL);
-    v.NZ = v.XN - v.obliquity;
+    v.KM = proposition2(v.midheavenLongitude, v.obliquity);
+    v.KO = v.declination - v.KM;
+    v.OKH = 180 - proposition16(v.midheavenLongitude, v.obliquity);
+    v.HK = TriangleSolver.adjacent(v.OKH, v.KO);
+    v.HO = TriangleSolver.opposite(v.OKH, v.KO);
+    v.AH = v.midheavenLongitude - v.HK - 90;
+    v.BL = proposition6(v.AH + 90, v.obliquity) - 90;
 
-    v.NOX = TriangleSolver.oppositeAngle(v.NXH, v.XN);
-    v.ZO = acos(cos(v.NZ) * cos(v.ON));
-    v.AZO = TriangleSolver.angleFromOppositeAndHypotenuse(v.ON, v.ZO);
-    console.log(v.XN);
-    if (v.XN < v.obliquity && 180 + v.XN > v.obliquity) v.AZO = 180 - v.AZO;
-    v.ZK = TriangleSolver.hypoteneusFromAdjacent(v.AZO, 90 - v.obliquity);
+    v.BM = proposition5(v.midheavenLongitude, v.obliquity) - 90;
+    v.NZ = TriangleSolver.adjacent(v.BM, 90 - v.declination);
+    if (v.midheavenLongitude > 180) v.NZ = -v.NZ;
+
+    v.YQ = TriangleSolver.hypoteneusFromAdjacent(v.BM, v.obliquity);
   }
 
   setupGui(gui) {
-    gui.addSlider('Star Longitude', this.variables, 'starLongitude', 0, 360);
-    gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90);
+    gui.addSlider('Decliantion', this.variables, 'declination', -90, 90);
+    gui.addSlider('Midheaven Longitude', this.variables, 'midheavenLongitude', 90, 270);
   }
 
 }

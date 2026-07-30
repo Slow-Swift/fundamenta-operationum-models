@@ -9,9 +9,9 @@ import { Vector3 } from "three";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
-import { proposition14, proposition16, proposition2, proposition5 } from "../math/propositions";
+import { proposition14, proposition16, proposition2, proposition5, proposition6 } from "../math/propositions";
 
-export class Proposition45 extends Model {
+export class Proposition46 extends Model {
 
   constructor() {
     super();
@@ -31,31 +31,33 @@ export class Proposition45 extends Model {
       horizon: new Equator(Point(0, 90)),
     };
 
-    p.Z = Point(0,90);
+    p.E = Point(0,0);
     p.B = Point(-90, 0);
     p.D = Point(90, 0);
-    p.E = Point(0,0);
+    p.Z = Point(0, 90);
     p.X = Point(90, 90 - v.obliquity);
-    p.T = Point(-90, -90 + v.obliquity);
     p.A = Point(-90, v.obliquity);
     p.C = Point(90, -v.obliquity);
-    p.H = distanceAlongArc(p.A, p.E, () => v.starLongitude - 90);
+    p.H = distanceAlongArc(p.A, p.E, () => v.AH);
+    p.L = Point(() => -180 + v.BL, 0);
     p.O = distanceAlongArc(p.H, p.X, () => v.starLatitude);
-    p.N = Point(-90, () => 90 - v.XN + v.obliquity);
-    p.L = Point(() => -90 + v.BL, 0);
-    p.M = Point(() => -90 + v.AZO, 0);
-    p.K = distanceAlongArc(p.Z, p.M, () => v.ZK);
+    p.N = distanceAlongArc(p.X, p.H, () => v.XN);
+    p.M = distanceAlongArc(p.Z, p.O, 90);
+    p.K = distanceAlongArc(p.O, p.Z, () => -v.OK);
+
     // *** Geometry ***
     g.ecliptic = new Equator(p.X);
-    g.XH = new Arc(p.X, p.H);
-    g.TH = new Arc(p.T, p.H);
-    g.ON = new Arc(p.O, p.N);
+    g.XL = new Arc(p.X, p.L);
+    g.LH = new Arc(p.L, p.H);
+    g.LO = new Arc(p.L, p.O);
+    g.ZN = new Arc(p.Z, p.N);
+    g.XN = new Arc(p.X, p.N);
     g.ZM = new Arc(p.Z, p.M);
-    g.OM = new Arc(p.O, p.M);
+    g.MO = new Arc(p.M, p.O);
     g.MK = new Arc(p.M, p.K);
 
-    g.HNO = new RightAngle(p.N, p.X, p.O);
-    g.KME = new RightAngle(p.M, p.K, p.E);
+    g.XHA = new RightAngle(p.H, p.X, p.A);
+    g.ZNX = new RightAngle(p.N, p.Z, p.X);
 
     this.createPointGeometries(p);
   }
@@ -65,21 +67,21 @@ export class Proposition45 extends Model {
     const v = this.variables;
     const g = this.geometry;
 
-    v.NXH = v.starLongitude - 90;
-    v.ON = TriangleSolver.opposite(v.NXH, 90 - v.starLatitude);
-    v.XN = TriangleSolver.adjacent(v.NXH, 90 - v.starLatitude);
-    if (v.NXH > 90) v.XN = mod(360 - v.XN, 360) - 180;
-    v.HL = TriangleSolver.adjacent(v.NXH, v.obliquity);
-    if (v.NXH > 90) v.HL = 180 - v.HL;
-    v.BL = TriangleSolver.opposite(v.NXH, 90 + v.HL);
-    v.NZ = v.XN - v.obliquity;
+    v.AH = v.starLongitude - 90;
+    v.BL = proposition6(v.starLongitude, v.obliquity);
 
-    v.NOX = TriangleSolver.oppositeAngle(v.NXH, v.XN);
-    v.ZO = acos(cos(v.NZ) * cos(v.ON));
-    v.AZO = TriangleSolver.angleFromOppositeAndHypotenuse(v.ON, v.ZO);
-    console.log(v.XN);
-    if (v.XN < v.obliquity && 180 + v.XN > v.obliquity) v.AZO = 180 - v.AZO;
-    v.ZK = TriangleSolver.hypoteneusFromAdjacent(v.AZO, 90 - v.obliquity);
+    v.ZN = TriangleSolver.opposite(v.AH, v.obliquity);
+    v.XN = TriangleSolver.adjacent(v.AH, v.obliquity);
+    if (v.AH > 90) v.XN = 180 - v.XN;
+    if (v.AH > 90) v.ZN = 180 - v.ZN;
+    v.NO = 90 - v.starLatitude - v.XN;
+    v.ZO = acos(cos(v.ZN) * cos(v.NO));
+    v.NOZ = TriangleSolver.angleFromOppositeAndHypotenuse(v.ZN, v.ZO);
+    v.HOK = mod(v.XN + 180, 360)-180 < 90 - v.starLatitude ? v.NOZ : 180 - v.NOZ;
+    v.OK = TriangleSolver.hypoteneusFromAdjacent(v.HOK, v.starLatitude);
+    console.log(v.NOZ, mod(v.XN + 180, 360)-180, v.NO);
+
+    this.setGeometryVisibility(v.starLongitude != 360, [g.N, g.XN]);
   }
 
   setupGui(gui) {

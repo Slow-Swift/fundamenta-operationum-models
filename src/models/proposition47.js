@@ -11,7 +11,7 @@ import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
 import { proposition14, proposition16, proposition2, proposition5 } from "../math/propositions";
 
-export class Proposition45 extends Model {
+export class Proposition47 extends Model {
 
   constructor() {
     super();
@@ -32,6 +32,7 @@ export class Proposition45 extends Model {
     };
 
     p.Z = Point(0,90);
+    p.Y = Point(0, -90);
     p.B = Point(-90, 0);
     p.D = Point(90, 0);
     p.E = Point(0,0);
@@ -44,7 +45,12 @@ export class Proposition45 extends Model {
     p.N = Point(-90, () => 90 - v.XN + v.obliquity);
     p.L = Point(() => -90 + v.BL, 0);
     p.M = Point(() => -90 + v.AZO, 0);
+    p.R = Point(() => 90 - v.AZO, 0);
     p.K = distanceAlongArc(p.Z, p.M, () => v.ZK);
+    p.Q = distanceAlongArc(p.Y, p.R, () => v.ZK);
+    p.S = Point(0, () => 90 - v.ZS);
+    p.P = distanceAlongArc(p.Q, p.Z, () => v.QP);
+
     // *** Geometry ***
     g.ecliptic = new Equator(p.X);
     g.XH = new Arc(p.X, p.H);
@@ -53,6 +59,10 @@ export class Proposition45 extends Model {
     g.ZM = new Arc(p.Z, p.M);
     g.OM = new Arc(p.O, p.M);
     g.MK = new Arc(p.M, p.K);
+    g.ZY = new Arc(p.Z, p.E, {length: 180});
+    g.ZR = new Arc(p.Z, p.R);
+    g.RQ = new Arc(p.R, p.Q);
+    g.RP = new Arc(p.R, p.P);
 
     g.HNO = new RightAngle(p.N, p.X, p.O);
     g.KME = new RightAngle(p.M, p.K, p.E);
@@ -77,13 +87,19 @@ export class Proposition45 extends Model {
     v.NOX = TriangleSolver.oppositeAngle(v.NXH, v.XN);
     v.ZO = acos(cos(v.NZ) * cos(v.ON));
     v.AZO = TriangleSolver.angleFromOppositeAndHypotenuse(v.ON, v.ZO);
-    console.log(v.XN);
     if (v.XN < v.obliquity && 180 + v.XN > v.obliquity) v.AZO = 180 - v.AZO;
     v.ZK = TriangleSolver.hypoteneusFromAdjacent(v.AZO, 90 - v.obliquity);
+    v.XS = TriangleSolver.hypoteneusFromAdjacent(v.NXH, v.obliquity);
+    v.ZS = TriangleSolver.opposite(v.NXH, v.XS);
+
+    v.EQR = TriangleSolver.oppositeAngle(v.obliquity, 90 - v.AZO);
+    v.EQ = TriangleSolver.hypoteneusFromAdjacent(v.obliquity, 90-v.AZO);
+    v.HQ = 90 - v.NXH + v.EQ;
+    v.QP = TriangleSolver.hypoteneusFromAdjacent(v.EQR, v.HQ);
   }
 
   setupGui(gui) {
-    gui.addSlider('Star Longitude', this.variables, 'starLongitude', 0, 360);
+    gui.addSlider('Star Longitude', this.variables, 'starLongitude', 90, 270);
     gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90);
   }
 
