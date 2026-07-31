@@ -55,6 +55,13 @@ import { Proposition50 } from './models/proposition50';
 import { Proposition51_Case1 } from './models/proposition51_case_1';
 import { Proposition51_Case2 } from './models/proposition51_case_2';
 import { Proposition52 } from './models/proposition52';
+import { Proposition53 } from './models/proposition53';
+import { Proposition54 } from './models/proposition54';
+import { Proposition56 } from './models/proposition56';
+import { Proposition57 } from './models/proposition57';
+import { Proposition58 } from './models/proposition58';
+import { Proposition55_Case1 } from './models/proposition55_case1';
+import { Proposition55_Case2 } from './models/proposition55_case2';
 
 const settings = window.settings = {
   darkMode: true,
@@ -114,6 +121,13 @@ const models = {
   'Proposition 51 Case 1': Proposition51_Case1,
   'Proposition 51 Case 2': Proposition51_Case2,
   'Proposition 52': Proposition52,
+  'Proposition 53': Proposition53,
+  'Proposition 54': Proposition54,
+  'Proposition 55 Version 1': Proposition55_Case1,
+  'Proposition 55 Version 2': Proposition55_Case2,
+  'Proposition 56': Proposition56,
+  'Proposition 57': Proposition57,
+  'Proposition 58': Proposition58,
   'Playground': Playground,
 };
 
