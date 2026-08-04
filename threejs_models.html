@@ -5,9 +5,42 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fundamenta Operationum Models</title>
+    <style>
+      body { margin: 0; }
+
+      .models {
+        width: 100dvw;
+        height: 100dvh;
+      }
+
+      .backBtn {
+        position: absolute;
+        z-index: 100;
+        top: 10px;
+        left: 10px;
+        color: var(--theme-slider-text);
+        background-color: var(--theme-slider-background);
+        border-radius: 10px;
+        width: 50px; 
+        height: 50px;
+        border: 2px solid var(--theme-slider-text);
+        text-align: center;
+        align-content: center;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 2em;
+      }
+
+      .backBtn:hover {
+        cursor: pointer;
+      }
+  </style>
+
     <link rel="stylesheet" href="src/style.css" type="text/css" media="all">
  </head>
   <body>
+    <a class="backBtn" href="/">&larr;</a>
+    <div class="models"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

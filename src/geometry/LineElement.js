@@ -3,7 +3,7 @@ import { Line2, LineGeometry, LineMaterial } from "three/examples/jsm/Addons.js"
 
 export class LineElement extends ModelElement {
   constructor({ thickness=5, ...args}={}) {
-    super(args); 
+    super({ themeColor: 'arc-normal', ...args});
 
     this.thickness = thickness;
 

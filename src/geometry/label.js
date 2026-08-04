@@ -43,6 +43,8 @@ export class Label {
     }
   }
 
+  setTheme() {}
+
   dispose() {}
 
 }

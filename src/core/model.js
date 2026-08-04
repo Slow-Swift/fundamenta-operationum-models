@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import { PointGeom } from "../geometry/point_geometry";
 import { Label } from "../geometry/label";
-import { warn } from "jsxgraph";
-import { array } from "three/tsl";
 
 export class Model {
 
@@ -97,6 +95,12 @@ export class Model {
   updatePointSize(zoom) {
     for (const point in this.pointGeometries) {
       this.pointGeometries[point].setScale(1/zoom); 
+    }
+  }
+
+  setTheme(theme) {
+    for (const geometry in this.geometry) {
+      this.geometry[geometry].setTheme(theme);
     }
   }
 

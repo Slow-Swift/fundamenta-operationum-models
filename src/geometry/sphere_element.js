@@ -6,10 +6,10 @@ export class SphereElement extends ModelElement {
   static POINT_GEOMETRY = new THREE.SphereGeometry(1, 8, 8);
 
   constructor(point, { size=0.99, resolution=64, ...args} = {}) {
-    super(args);
+    super({ themeColor: 'sphere', ...args });
     this.point = point;
     this.geometry = new THREE.SphereGeometry(size, resolution, resolution);
-    this.material = new THREE.MeshBasicMaterial({ color: this.color });
+    this.material = new THREE.MeshBasicMaterial();
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.copy(this.point);
     this.mesh.visible = this.visible;

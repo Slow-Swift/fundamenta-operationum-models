@@ -1,9 +1,7 @@
 export class ModelElement {
 
-  constructor({ color=0x7b6148, darkColor=0xad946f, visible=true }={}) {
-    this.lightColor = color;
-    this.color = this.lightColor;
-    this.darkColor = darkColor;
+  constructor({ themeColor='normal', visible=true }={}) {
+    this.themeColor=themeColor;
     this.visible = visible; 
     this.children = [];
   }
@@ -15,15 +13,17 @@ export class ModelElement {
     }
   }
 
-  update() {
-    this.color = window.settings.darkMode && this.darkColor != undefined ? this.darkColor : this.lightColor; 
-    this.material.setValues({ color: this.color });
-  }
+  update() { }
 
   updateRender(time, camera) {
     for (const child of this.children) {
       child.updateRender(time, camera);
     }
+  }
+
+  setTheme(theme) {
+    const color = theme.get(this.themeColor);
+    this.material.setValues({ color: color });
   }
 
   addChild(child) {
