@@ -1,7 +1,5 @@
 import renderMathInElement from "katex/contrib/auto-render/auto-render.js";
-import katex from "katex";
 import { round } from "../math/degMath";
-import { degreeFormatter } from "../geometry/label";
 
 export class ModelGui {
 
@@ -136,17 +134,12 @@ export class ModelGui {
     });
   }
 
-  addSlider(label, object={}, field, min=0, max=90, { step=0.1, formatter=degreeFormatter } = {}) {
+  addSlider(label, object={}, field, min=0, max=90, { step=0.1, formatter=undefined } = {}) {
     const slider = document.createElement('div');
     slider.classList.add('slidecontainer');
 
     const text = document.createElement('p');
-    const labelSpan = document.createElement('span');
-    const valueSpan = document.createElement('span');
-    text.appendChild(labelSpan);
-    text.appendChild(valueSpan);
-labelSpan.innerText = `${label}: `;
-    
+
     const input = document.createElement('input');
     input.type = 'range';
     input.classList.add('slider');
@@ -156,7 +149,7 @@ labelSpan.innerText = `${label}: `;
     input.value = object[field];
     slider.lastSetValue = object[field];
     input.oninput = (e) => {
-      katex.render(formatter ? formatter(input.value) : input.value, valueSpan);
+      text.innerText = `${label}: ${formatter ? formatter(input.value) : input.value}`;
       const numbericValue = input.value * 1;
 
       if (e) {
@@ -168,6 +161,7 @@ labelSpan.innerText = `${label}: `;
       object[field] = numbericValue;
       this.onInputChanged?.();
     }
+    text.innerText = `${label}: ${formatter ? formatter(input.value) : input.value}`
     
     const rangeLabels = document.createElement('div');
     rangeLabels.classList.add('slider-range');
@@ -190,8 +184,8 @@ labelSpan.innerText = `${label}: `;
     slider.setRange = function (min, max) {
       input.min = round(min, 1);
       input.max = round(max, 1);
-      katex.render(formatter ? formatter(input.min) : input.min, startLabel);
-      katex.render(formatter ? formatter(input.max) : input.max, endLabel);
+      startLabel.innerText = formatter ? formatter(input.min) : input.min;
+      endLabel.innerText = formatter ? formatter(input.max) : input.max;
 
       input.value = slider.lastSetValue;
 

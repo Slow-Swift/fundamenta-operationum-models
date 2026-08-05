@@ -22,7 +22,7 @@ export class Model {
 
     this.gui = gui;
     this.setupGui(gui);
-    if (this.lazy) { gui.onSliderChanged = () => this.update() }
+    if (this.lazy) { gui.onInputChanged = () => this.update() }
     
     this.setState(1);
   }
@@ -65,7 +65,7 @@ export class Model {
   setState() {}
 
   dispose() {
-    this.gui.onSliderChanged = undefined;
+    this.gui.onInputChanged = undefined;
 
     for (const geometry in this.geometry) {
       this.scene.remove(this.geometry[geometry].mesh);
@@ -82,7 +82,9 @@ export class Model {
       const pointGeom = new PointGeom(points[point], {color: 0x967e62, darkColor: 0x81694d, visible: !hidden.includes(points[point])});
       this.geometry[point] = pointGeom;
       this.pointGeometries[point] = pointGeom;
-      pointGeom.addChild(new Label(point, new THREE.Vector3(0, 0, 0)));
+      const label = new Label(point, new THREE.Vector3(0, 0, 0));
+      label.update();
+      pointGeom.addChild(label);
     }
   }
 

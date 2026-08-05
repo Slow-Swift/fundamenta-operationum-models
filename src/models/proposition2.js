@@ -1,6 +1,6 @@
-import { distanceAlongArc, Point } from "../math/spherical";
+import { distance, distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
-import { Label } from "../geometry/label";
+import { ArcLabel, northSouthFormatter, Label } from "../geometry/label";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
@@ -10,6 +10,7 @@ import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import { round } from "../math/degMath";
 import * as TriangleSolver from "../math/TriangleSolver";
+import { proposition5 } from "../math/propositions";
 
 export class Proposition2 extends Model {
 
@@ -18,63 +19,61 @@ export class Proposition2 extends Model {
 
     this.parameters = {
       g_angle: 40,
-      obliquity: 23.5
+      obliquity: 23.5,
+      arcLabels: false,
     };
   }
 
   createModel() {
     const v = this.parameters;
-    const p = this.points = {
-      E:  Point(0, 0), // Equator Centre
-      A:  Point(90, 0), // Equator Horizon Right
-      C:  Point(-90, 0), // Equator Horizon Left
+    const p = this.points = { };
+    p.E = Point(0, 0); // Equator Centre
+    p.A = Point(90, 0); // Equator Horizon Right
+    p.C = Point(-90, 0); // Equator Horizon Left
 
-      B: Point(), // Ecliptic-Horizon Right 
-      D: Point(), // Ecliptic-Horizon Left
+    p.B = Point(90, v.obliquity); // Ecliptic-Horizon Right 
+    p.D = Point(-90, -v.obliquity); // Ecliptic-Horizon Left
 
-      F: Point(0, 90), // North Pole
-      G: Point(),
-      H: Point(),
-    };
+    p.F = Point(0, 90); // North Pole
+    p.G = distanceAlongArc(p.E, p.B, () => v.g_angle);
+    p.H = distanceAlongArc(p.F, p.G, 90);
+    p.X = distanceAlongSmallCircle(p.F, p.H, -90);
 
-
-    this.geometry = {
+    const g = this.geometry = {
       sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
       equator: new Equator(p.F), 
       ecliptic: new Arc(p.E, p.B, { length: 360 }),
       horizon: new Arc(p.F, p.A, { length: 360 }),
       FG: new Arc(p.F, p.G), 
+      GH: new Arc(p.G, p.H),
 
-      declinationLabel: new Label('0', Point()),
       angleA: new RightAngle(p.A, p.E, p.F),
       angleB: new RightAngle(p.B, p.E, Point(-90, 45)),
       angleH: new RightAngle(p.H, p.E, p.G),
-      angleE: new AngleElement(p.E, () => Math.abs(v.g_angle) < 90 ? p.G : v.g_angle < 0 ? p.D : p.B, () => Math.abs(v.g_angle) < 90 ? p.H : v.g_angle < 0 ? p.C : p.A),
-      g_angleLabel: new Label(),
+      angleE: new AngleElement(p.E, p.G, p.H), 
+
+      longitudeLabel: new ArcLabel(p.E, p.G, { pole: Point(-90, 90 - v.obliquity), shortest: false }),
+      declinationLabel: new ArcLabel(p.H, p.G, { pole: p.X, formatter: northSouthFormatter}),
     };
 
     this.createPointGeometries(p);
-  }
+    this.setGeometryVisibility(false, [g.X]);
+  } 
 
   updateCalculations() {
-    this.points.B.copy(Point(90, this.parameters.obliquity));
-    this.points.D.copy(Point(-90, -this.parameters.obliquity));
-    this.points.G.copy(distanceAlongArc(this.points.E, this.points.B, this.parameters.g_angle));
-    this.points.H.copy(distanceAlongArc(this.points.F, this.points.G, 90));
+    const v = this.parameters;
+    const p = this.points;
+    const g = this.geometry;
 
     this.geometry.FG.point2 = this.parameters.g_angle > 0 ? this.points.H : this.points.G;
+    v.rightAscension = proposition5(v.g_angle, v.obliquity);
 
-    const declination = TriangleSolver.opposite(this.parameters.obliquity, this.parameters.g_angle); 
-    const decLabelPos = distanceAlongArc(this.points.G, this.points.H, Math.abs(declination) / 2);
-    this.geometry.declinationLabel.position = decLabelPos;
-    this.geometry.declinationLabel.text = round(declination, 1);
-    
-    this.geometry.g_angleLabel.position = distanceAlongArc(this.points.E, this.points.B, this.parameters.g_angle/2);
-    this.geometry.g_angleLabel.text = round(this.parameters.g_angle, 1);
+    this.setGeometryVisibility(this.parameters.arcLabels, [g.declinationLabel, g.angleE.label, g.longitudeLabel]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Ecliptic Longitude', this.parameters, 'g_angle', -180, 180);
+    gui.addSlider('Ecliptic Longitude', this.parameters, 'g_angle', 0, 360);
+    gui.addToggle('Show Arc Labels', this.parameters, 'arcLabels');
   }
 
 }

@@ -264,6 +264,60 @@
   transform: translateX(24px); 
 }
 
+.toggle {
+  padding: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  user-select: none;
+  pointer-events: all;
+  --toggle-height: 1.5rem;
+  --toggle-width: calc(var(--toggle-height) * 2);
+  --toggle-padding: 2px;
+}
+
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-switch {
+  flex-shrink: 0;
+  background-color: var(--theme-slider-background);
+  border: var(--toggle-padding) solid var(--theme-slider-text);
+  border-radius: var(--toggle-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: relative;
+  height: var(--toggle-height);
+  width: var(--toggle-width);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch::before {
+  content: "";
+  box-sizing: border-box;
+  border: 2px solid var(--theme-slider-text);
+  background-color: var(--theme-slider-background);
+  border-radius: 50%;
+  position: absolute;
+  top: var(--toggle-padding);
+  left: var(--toggle-padding);
+  height: calc(var(--toggle-height) - 2 * var(--toggle-padding));
+  width: calc(var(--toggle-height) - 2 * var(--toggle-padding));
+  transform: translateX(0px);
+  transition: transform 0.1s linear, background-color 0.1s linear;
+}
+
+.toggle input:checked + .toggle-switch::before {
+  background-color: var(--theme-slider-text);
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-height))); 
+}
+
 .theme-icon {
   pointer-events: none;
   z-index: 2;

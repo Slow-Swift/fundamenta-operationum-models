@@ -36,6 +36,41 @@ export function pole(point1, point2) {
   return u.clone().cross(point2).normalize();
 }
 
+/**
+* Determine the distance between two points
+*
+* If pole is not given, the shortest distance between two points is returned.
+* If pole is given, point1 and point2 are first projected to the equator of pole and the
+* counterclockwise distance from A to B is returned.
+*/
+export function distance(a, b, p=undefined) {
+  if (typeof a === 'function' || typeof b === 'function' || p === 'function') {
+    return function() {
+      const evalP1 = typeof a === 'function' ? a() : a;
+      const evalP2 = typeof b === 'function' ? b() : b;
+      const evalPole = typeof p === 'function' ? p() : p;
+      return distance(evalP1, evalP2, evalPole);
+    };
+  }
+
+  if (p === undefined) {
+    const dot = Math.max(-1, Math.min(1, a.dot(b)));
+    return acos(dot);
+  }
+
+  a = projectToEquator(a, p);
+  b = projectToEquator(b, p);
+
+  if (a.length() < 0.5 || b.length() < 0.5) return 0;
+  
+  const distance = acos(a.dot(b));
+  if (p.dot(pole(a, b)) > 0) {
+    return distance;
+  } else {
+    return 360 - distance;
+  }
+}
+
 export function UpdatePoint(point, lat, lon) {
   point.x = Math.sin(lat) * Math.cos(lon);
   point.y = Math.sin(lon);

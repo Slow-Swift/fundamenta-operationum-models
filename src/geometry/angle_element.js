@@ -1,7 +1,7 @@
 import { smallCircleArc, projectToEquator, distanceAlongSmallCircle } from "../math/spherical";
 import { LineElement } from "./LineElement";
 import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
-import { Label } from "./label";
+import { degreeFormatter, Label } from "./label";
 
 export class AngleElement extends LineElement {
   
@@ -36,7 +36,7 @@ export class AngleElement extends LineElement {
     const angle = (alignment > 0 && !this.alwaysSmallest ? 180 : 0) + acos(projectToEquator(leftPoint, center).dot(projectToEquator(rightPoint, center)));
 
     if (this.showLabel) {
-      this.label.text = distance > 0 ? Math.round(angle * 10) / 10 : '';
+      this.label.text = distance > 0 ? degreeFormatter(angle) : '';
       this.label.position = distanceAlongSmallCircle(center, rightPoint, angle/2, 90-distance * 1.3, true);
       this.label.update();
     } 
