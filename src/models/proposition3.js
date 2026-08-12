@@ -27,12 +27,12 @@ export class Proposition3 extends Model {
     const v = this.parameters;
     const p = this.points = {
       E:  Point(0, 0), // Equator Centre
-      A:  Point(90, 0), // Equator Horizon Right
-      C:  Point(-90, 0), // Equator Horizon Left
+      A:  Point(-90, 0), // Equator Horizon Right
+      C:  Point(90, 0), // Equator Horizon Left
     };
 
-    p.B = Point(90, v.obliquity); // Ecliptic-Horizon Right 
-    p.D = Point(-90, -v.obliquity); // Ecliptic-Horizon Left
+    p.B = Point(-90, v.obliquity); // Ecliptic-Horizon Right 
+    p.D = Point(90, -v.obliquity); // Ecliptic-Horizon Left
 
     p.F = Point(0, 90); // North Pole
     p.G = distanceAlongArc(p.E, p.B, () => v.eclipticLongitude);
@@ -52,7 +52,7 @@ export class Proposition3 extends Model {
       angleH: new RightAngle(p.H, p.E, p.G),
       angleE: new AngleElement(p.E, p.G, p.H),
 
-      longitudeLabel: new ArcLabel(p.E, p.G, { pole: Point(-90, 90 - v.obliquity), shortest: false }),
+      longitudeLabel: new ArcLabel(p.E, p.G, { pole: Point(90, 90 - v.obliquity), shortest: true }),
       declinationLabel: new ArcLabel(p.H, p.G, { pole: p.X, formatter: northSouthFormatter}),
     };
 
@@ -69,7 +69,7 @@ export class Proposition3 extends Model {
 
     v.eclipticLongitude = TriangleSolver.hypoteneusFromOpposite(this.parameters.obliquity, this.parameters.declination);
 
-    this.setGeometryVisibility(this.parameters.arcLabels, [g.declinationLabel, g.angleE.label, g.longitudeLabel]);
+    this.setGeometryVisibility(this.parameters.arcLabels, [g.declinationLabel, g.angleE, g.longitudeLabel]);
   }
 
   setupGui(gui) {

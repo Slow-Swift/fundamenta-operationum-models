@@ -1,16 +1,15 @@
 import { Proposition2 } from './proposition2';
-import { Proposition14 } from './proposition14';
-import { Proposition7 } from './proposition7';
-import { Proposition9 } from './proposition9';
-import { Proposition34 } from './proposition34';
 import { Proposition2Animated } from './proposition2-animated';
 import { Proposition3 } from './proposition3';
 import { Proposition4 } from './proposition4';
 import { Proposition5 } from './proposition5';
 import { Proposition6 } from './proposition6';
+import { Proposition7 } from './proposition7';
 import { Proposition8 } from './proposition8';
+import { Proposition9 } from './proposition9';
 import { Proposition11 } from './proposition11';
 import { Proposition13 } from './proposition13';
+import { Proposition14 } from './proposition14';
 import { Proposition15 } from './proposition15';
 import { Proposition16 } from './proposition16';
 import { Proposition17 } from './proposition17';
@@ -30,8 +29,8 @@ import { Proposition28 } from './proposition28';
 import { Proposition29 } from './proposition29';
 import { Proposition31 } from './proposition31';
 import { Proposition32 } from './proposition32';
-import { Playground } from './playground';
 import { Proposition33 } from './proposition33';
+import { Proposition34 } from './proposition34';
 import { Proposition34Extra } from './proposition34Extra';
 import { Proposition35 } from './proposition35';
 import { Proposition36 } from './proposition36';
@@ -58,6 +57,7 @@ import { Proposition57 } from './proposition57';
 import { Proposition58 } from './proposition58';
 import { Proposition55_Case1 } from './proposition55_case1';
 import { Proposition55_Case2 } from './proposition55_case2';
+import { Playground } from './playground';
 
 export const models = {
   'Proposition 2': Proposition2,
@@ -69,6 +69,7 @@ export const models = {
   'Proposition 7': Proposition7,
   'Proposition 8': Proposition8,
   'Proposition 9': Proposition9,
+  'Proposition 10': Proposition9,
   'Proposition 11': Proposition11,
   'Proposition 13': Proposition13,
   'Proposition 14': Proposition14,

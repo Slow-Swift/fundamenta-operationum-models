@@ -1,6 +1,6 @@
 import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
@@ -17,28 +17,32 @@ export class Proposition7 extends Model {
     super();
 
     this.parameters = {
-      latitude: 40,
-      declination: 30,
+      latitude: 60,
+      declination: -15,
       obliquity: 23.44,
+      arcLabels: false,
     };
   }
 
   createModel() {
+    const v = this.parameters;
     const p = this.points = {
       E:  Point(0, 0), // Horizon Centre
       B:  Point(-90, 0), // Horizon South
       D:  Point(90, 0), // Horizon North
       
-      A:  Point(), // Equator Horizon Left
-      C:  Point(), // Equator Horizon Right
+      A:  Point(-90, () => 90 - v.latitude), // Equator Horizon Left
+      C:  Point(90, () => v.latitude - 90), // Equator Horizon Right
 
-      Z: Point(), // South Pole
-      K: Point(), // Projection of H
-      H: Point(), // Intersection of Horizon and Ecliptic
+      Z: Point(-90, () => -v.latitude), // South Pole
+      H: Point(() => v.ortiveAmplitude, 0), // Intersection of Horizon and Ecliptic
 
       // G: Point(45, 5), // A second point on the ecliptic
       // J: Point(),
     };
+
+    p.K = distanceAlongArc(p.E, p.C, () => v.EK);
+    p.X = distanceAlongSmallCircle(p.Z, p.K, -90);
 
 
     const g = this.geometry = {
@@ -48,53 +52,38 @@ export class Proposition7 extends Model {
       meridian: new Equator(p.E),
       ZK: new Arc(p.Z, p.K), 
       ZH: new Arc(p.Z, p.H),
-      declinationLabel: new Label('0', Point()),
-      ortiveAmplitudeLabel: new Label('0', Point()),
-      latLabel: new Label(),
-      latComplement: new Label(),
+
+      declinationLabel: new ArcLabel(p.H, p.K, { pole: p.X, formatter: northSouthFormatter}),
+      ortiveAmplitudeLabel: new ArcLabel(p.E, p.H, { pole: Point(0, 90), formatter: northSouthFormatter}),
+      latitudeLabel: new ArcLabel(p.B, p.Z, { pole: p.E }),
 
       // Angles
       angle_B: new RightAngle(p.B, p.A, p.E),
       angle_A: new RightAngle(p.A, Point(90, 45), p.E),
       angle_K: new RightAngle(p.K, p.E, p.H),
       angle_E: new AngleElement(p.E, p.H, p.K),
-
-      // ecliptic: new Arc(p.H, p.G, { thickness: 1, length: 360 }),
-      // ecliptic2: new Arc(p.H, p.J, {thickness: 1, length: 360 }),
     };
 
     this.createPointGeometries(p);
+    this.setGeometryVisibility(false, [g.X]);
   }
 
   updateCalculations() {
+    const v = this.parameters;
+    const p = this.points;
     const g = this.geometry;
-    this.declinationSlider?.setRange(-Math.min(90-this.parameters.latitude, 23.5), Math.min(90-this.parameters.latitude, 23.5));
+    this.declinationSlider?.setRange(-90+this.parameters.latitude, 90-this.parameters.latitude, 23.5);
 
-    this.points.Z.copy(Point(-90, -this.parameters.latitude));
-    this.points.A.copy(Point(-90, 90-this.parameters.latitude));
-    this.points.C.copy(Point(90, -90+this.parameters.latitude));
-
-    
-    const ortiveAmplitude = TriangleSolver.hypoteneusFromOpposite(90 - this.parameters.latitude, this.parameters.declination); 
-    this.points.H.copy(Point(Number.isNaN(ortiveAmplitude) ? 0 : -ortiveAmplitude, 0));
-    this.points.K.copy(distanceAlongArc(this.points.Z, this.points.H, 90));
-    
-    this.geometry.ortiveAmplitudeLabel.text = Math.round(ortiveAmplitude*10)/10;
-    this.geometry.ortiveAmplitudeLabel.position = Point(-ortiveAmplitude / 2, 0);
-
-    this.geometry.declinationLabel.text = this.parameters.declination;
-    this.geometry.declinationLabel.position = distanceAlongArc(this.points.H, this.points.K, Math.abs(this.parameters.declination/2));
-
-    this.geometry.latLabel.text = this.parameters.latitude;
-    this.geometry.latLabel.position = distanceAlongArc(this.points.Z, this.points.B, this.parameters.latitude/2);
-    this.geometry.latComplement.text = round(90 - this.parameters.latitude, 1);
-    this.geometry.latComplement.position = distanceAlongArc(this.points.B, this.points.A, (90 - this.parameters.latitude) / 2);
-    this.setGeometryVisibility(this.parameters.latitude < 90, [g.K, g.H, g.angle_K, g.ZK, g.ZH]);
+    v.ortiveAmplitude = TriangleSolver.hypoteneusFromOpposite(90 - this.parameters.latitude, this.parameters.declination); 
+    v.EK = v.latitude == 90 ? 90 : TriangleSolver.adjacent(90 - v.latitude, v.ortiveAmplitude);
+    this.setGeometryVisibility(v.latitude < 90, [g.K, g.H, g.angle_K]);
+    this.setGeometryVisibility(v.arcLabels, [g.angle_E, g.declinationLabel, g.ortiveAmplitudeLabel, g.latitudeLabel]);
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
-    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', -23.5, 23.5);
+    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', this.parameters.latitude - 90, 90 - this.parameters.latitude, {formatter: northSouthFormatter});
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

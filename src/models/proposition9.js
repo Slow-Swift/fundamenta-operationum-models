@@ -1,6 +1,6 @@
 import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
-import { Label } from "../geometry/label";
+import { ArcLabel, degreeFormatter, Label, northSouthFormatter } from "../geometry/label";
 import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
@@ -17,18 +17,21 @@ export class Proposition9 extends Model {
     super();
 
     this.parameters = {
-      latitude: 40,
-      ecliptic_longitude: 30,
+      latitude: 60,
+      ecliptic_longitude: 210,
       declination: 30,
       obliquity: 23.5,
       ortiveAmplitude: 40,
+      arcLabels: false,
+      showEcliptic: false,
     };
 
     this.calculations = {};
   }
 
   createModel() {
-    const c = this.calculations;
+    const v = this.parameters;
+    const c = this.parameters;
     const p = this.points = {
       E:  Point(0, 0), // Horizon Centre
       B:  Point(-90, 0), // Horizon South
@@ -45,7 +48,10 @@ export class Proposition9 extends Model {
 
     p.K = distanceAlongArc(p.Z, p.H, 90);
     p.V = distanceAlongArc(p.E, p.C, () => -c.EV);
+    p.V_c = distanceAlongArc(p.E, p.C, () => -v.EV + 90);
     p.V_p = distanceAlongSmallCircle(p.X, p.V, 270, 90 - this.parameters.obliquity);
+    p.V_e = distanceAlongSmallCircle(p.V, p.V_c, v.obliquity);
+    p.K_p = distanceAlongArc(p.E, p.C, () => v.KE + 90);
 
     const g = this.geometry = {
       sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
@@ -55,44 +61,53 @@ export class Proposition9 extends Model {
       meridian: new Equator(p.E),
       ZK: new Arc(p.Z, p.K, {end: 90}), 
 
-      ortiveAmplitudeLabel: new Label(() => round(c.ortiveAmplitude, 1), Point(() => c.ortiveAmplitude / 2, 0)),
-      declinationLabel: new Label(() => round(c.declination, 1), distanceAlongArc(this.points.H, this.points.K, () => Math.abs(c.declination/2))),
-      EK_complement_label: new Label(() => round(c.EK_c, 1), distanceAlongArc(p.K, () => c.ortiveAmplitude < 0 ? p.A() : p.C(), () => Math.abs(c.EK_c /2))), 
-      urnal_label: new Label(() => round(c.urnal, 1), distanceAlongSmallCircle(p.Z, p.H, () => c.urnal/2, () => -c.declination)),
+      ortiveAmplitudeLabel: new ArcLabel(p.E, p.H, {pole: Point(0, 90), formatter: northSouthFormatter}),
+      declinationLabel: new ArcLabel(p.H, p.K, { pole: p.K_p, formatter: northSouthFormatter }),
+      EK_complement_label: new Label(() => degreeFormatter(c.EK_c, 1), distanceAlongArc(p.K, () => c.ortiveAmplitude < 0 ? p.A() : p.C(), () => Math.abs(c.EK_c /2))), 
+      urnal_label: new Label(() => degreeFormatter(c.urnal, 1), distanceAlongSmallCircle(p.Z, p.H, () => c.urnal/2, () => -c.declination)),
       latitude: new SmallCircleArc(p.H, p.L, p.Z),
-      latLabel: new Label(() => round(this.parameters.latitude, 1), distanceAlongArc(p.Z, p.B, () => this.parameters.latitude / 2)),
-      latComplement: new Label(() => round(90 - this.parameters.latitude, 1), distanceAlongArc(p.B, p.A, () => (90 - this.parameters.latitude) / 2)),
-      eclipticLongitudeLabel: new Label(() => round(this.parameters.ecliptic_longitude, 1), distanceAlongArc(p.V, p.H, () => Math.abs(this.parameters.ecliptic_longitude / 2))),
+      latLabel: new Label(() => degreeFormatter(this.parameters.latitude, 1), distanceAlongArc(p.Z, p.B, () => this.parameters.latitude / 2)),
+      eclipticLongitudeLabel: new ArcLabel(p.V, p.H, { pole: p.V_p, shortest: false}),
 
       // Angles
       angle_B: new RightAngle(p.B, p.A, p.E),
       angle_A: new RightAngle(p.A, Point(90, 45), p.E),
       angle_K: new RightAngle(p.K, p.E, p.H),
       angle_E: new AngleElement(p.E, p.H, p.K),
-      angle_V: new AngleElement(p.V, p.E, p.H),
+      angle_V: new AngleElement(p.V, p.V_c, p.V_e),
     };
 
     this.createPointGeometries(p);
-    // this.setGeometryVisibility(false, [g.ecliptic, g.V_p, g.V, g.angle_V, g.eclipticLongitudeLabel]);
+    this.setGeometryVisibility(false, [g.V_p, g.K_p, g.V_e, g.V_c]);
   }
 
   updateCalculations() {
     const p = this.parameters;
-    const c = this.calculations;
+    const v = this.parameters;
+    const c = this.parameters;
+    const g = this.geometry;
     c.declination = TriangleSolver.opposite(p.obliquity, p.ecliptic_longitude); 
     c.ortiveAmplitude = TriangleSolver.hypoteneusFromOpposite(90 - p.latitude, c.declination);
     c.rightAscension = TriangleSolver.adjacent(p.obliquity, p.ecliptic_longitude);
+    if (v.ecliptic_longitude > 180) {
+      c.rightAscension = 360 - c.rightAscension;
+    }
     c.KE = TriangleSolver.adjacent(90 - p.latitude, c.ortiveAmplitude);
     c.EV = c.rightAscension - c.KE;
-    console.log(c.rightAscension, c.KE, c.EV);
 
     c.EK_c = asin(sin(90-c.ortiveAmplitude)/sin(90-c.declination));
     c.urnal = c.ortiveAmplitude < 0 ? c.EK_c : 180-c.EK_c;
+
+    this.setGeometryVisibility(v.arcLabels, [g.ortiveAmplitudeLabel, g.EK_complement_label, g.angle_E, g.urnal_label, g.declinationLabel, g.latLabel]);
+    this.setGeometryVisibility(v.showEcliptic, [g.ecliptic, g.V]);
+    this.setGeometryVisibility(v.showEcliptic && v.arcLabels, [g.angle_V, g.eclipticLongitudeLabel]);
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90-this.parameters.obliquity);
-    gui.addSlider('Ecliptic Longitude', this.parameters, 'ecliptic_longitude', -180, 180);
+    gui.addSlider('Ecliptic Longitude', this.parameters, 'ecliptic_longitude', 0, 360);
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
+    gui.addToggle('Show Ecliptic', this.parameters, 'showEcliptic');
   }
 
 }

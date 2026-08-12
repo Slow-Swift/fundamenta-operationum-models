@@ -1,17 +1,14 @@
 import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
-import { Label } from "../geometry/label";
-import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
+import { ArcLabel, degreeFormatter, Label, northSouthFormatter } from "../geometry/label";
 import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
-import { LatitudeCircle } from "../geometry/latitude_circle";
-import { SmallCircleArc } from "../geometry/small_circle_arc";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
-import { proposition11 } from "../math/propositions";
+import * as TriangleSolver from "../math/TriangleSolver";
 
 export class Proposition11 extends Model {
 
@@ -24,6 +21,7 @@ export class Proposition11 extends Model {
       declination: 30,
       obliquity: 23.5,
       ortiveAmplitude: 40,
+      arcLabels: false,
     };
 
     this.calculations = {
@@ -51,15 +49,16 @@ export class Proposition11 extends Model {
     p.L = distanceAlongArc(p.E, p.A, () => this.parameters.oblique_ascension);
     p.M = Point(() => this.calculations.EM, 0);
     p.Q = distanceAlongArc(p.L, p.K, () => Math.abs(this.calculations.LQ));
+    p.P = distanceAlongSmallCircle(p.Z, p.L, 270, 90 - this.parameters.obliquity);
 
-    this.geometry = {
+    const g = this.geometry = {
       sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
       meridian: new Equator(p.E),
       horizon: new Equator(Point(0, 90)),
       equator: new Equator(p.Z),
+      ecliptic: new Equator(p.P),
       EZ: new Equator(p.A),
 
-      LK: new Arc(p.L, p.K, {length:360}),
 
       ELK: new AngleElement(p.L, p.K, p.E),
       EKL: new AngleElement(p.K, p.E, p.L),
@@ -72,22 +71,27 @@ export class Proposition11 extends Model {
       MKQ: new AngleElement(p.K, p.Q, p.M),
       KQM: new AngleElement(p.Q, p.M, p.K),
 
-      obliqueAscensionLabel: new Label(() => this.parameters.oblique_ascension, distanceAlongArc(p.E, p.A, () => this.parameters.oblique_ascension / 2)),
-      KL_label: new Label(() => round(this.calculations.KL, 1), distanceAlongArc(p.L, p.K, () => Math.abs(this.calculations.KL / 2))),
-      ZD_label: new Label(() => this.parameters.latitude, distanceAlongArc(p.D, p.Z, () => this.parameters.latitude / 2)),
-      KQ: new Label(() => round(this.calculations.KQ, 1), distanceAlongArc(p.K, p.Q, () => Math.abs(this.calculations.KQ / 2))),
+      obliqueAscensionLabel: new ArcLabel(p.L, p.E, { pole: p.Z, shortest: false }),
+      LE_label: new ArcLabel(p.L, p.E, { pole: p.Z }),
+      KL_label: new Label(() => degreeFormatter(Math.abs(this.calculations.KL), 1), distanceAlongArc(p.L, p.K, () => Math.abs(this.calculations.KL / 2))),
+      ZD_label: new Label(() => degreeFormatter(this.parameters.latitude), distanceAlongArc(p.D, p.Z, () => this.parameters.latitude / 2)),
+      KQ: new Label(() => degreeFormatter(Math.abs(this.calculations.KQ), 1), distanceAlongArc(p.K, p.Q, () => Math.abs(this.calculations.KQ / 2))),
+      KE: new ArcLabel(p.E, p.K),
     };
 
     this.createPointGeometries(p);
+    this.setGeometryVisibility(false, [g.P]);
   }
 
   updateCalculations() {
     const p = this.parameters;
+    const v = this.parameters;
+    const g = this.geometry;
     const lat = p.latitude;
     const obl = p.oblique_ascension;
 
     const EKL = acos(cos(obl) * sin(this.parameters.obliquity));
-    const KL = asin(sin(obl) / sin(EKL));
+    const KL = TriangleSolver.hypoteneusFromAdjacent(v.obliquity, v.oblique_ascension);
     const EK = asin(sin(KL) * sin(this.parameters.obliquity));
     const EKQ = 180 - EKL;
 
@@ -98,20 +102,24 @@ export class Proposition11 extends Model {
     const MKQ = EKQ - EKM;
     const MQK = acos(sin(MKQ) * cos(KM));
 
-    const KQ = MKQ > 90 ? (obl > 0 ? 180 : -180) - asin(sin(KM) / sin(MQK)) : asin(sin(KM) / sin(MQK));
+    const KQ = TriangleSolver.hypoteneusFromAdjacent(MKQ, KM);
+    // const KQ = MKQ > 90 ? (obl > 0 ? 180 : -180) - asin(sin(KM) / sin(MQK)) : asin(sin(KM) / sin(MQK));
     const LQ = KL + KQ;
 
     this.calculations.KL = KL;
     this.calculations.EK = EK;
-    this.calculations.EM = EM;
+    this.calculations.EM = EM * Math.sign(180 - v.oblique_ascension);
     this.calculations.KQ = KQ;
     this.calculations.LQ = LQ;
 
+    this.setGeometryVisibility(!(v.oblique_ascension == 360 && v.latitude == 90 - v.obliquity), [g.Q, g.KQ, g.MKQ, g.KQM]);
+    this.setGeometryVisibility(v.arcLabels, [g.KL_label, g.ZD_label,g.EKL, g.EKM, g.KQM, g.MKQ, g.KQ, g.ELK, g.obliqueAscensionLabel, g.KE, g.LE_label]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
-    gui.addSlider('Oblique Ascension', this.parameters, 'oblique_ascension', -90, 90);
+    gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90-this.parameters.obliquity);
+    gui.addSlider('Oblique Ascension', this.parameters, 'oblique_ascension', 0, 360 );
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }
