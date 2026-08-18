@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -19,6 +19,7 @@ export class Proposition22 extends Model {
       ascendentLongitude: 40,
       latitude: 30,
       obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -33,8 +34,6 @@ export class Proposition22 extends Model {
       D: Point(90, 0),  // Horizon Right
       H: Point(0, 90), // Zenith
       A_e: Point(-90, () => 90 - this.parameters.latitude),
-      A: Point(-90, () => 90 - this.parameters.latitude + c.A_declination),
-      C: Point(90, () => -90 + this.parameters.latitude - c.A_declination),
     };
 
     p.E = Point(() => c.E_ortiveAmplitude, 0);
@@ -58,6 +57,12 @@ export class Proposition22 extends Model {
       LMB: new RightAngle(p.M, p.L, p.B),
     };
 
+    g.OE_label = new ArcLabel(p.O, p.E, { pole: p.H, formatter: northSouthFormatter });
+    g.HL_label = new ArcLabel(p.H, p.L);
+    g.AL_label = new ArcLabel(p.A, p.L);
+    g.HAL = new AngleElement(p.A, p.H, p.L);
+    g.LHA = new AngleElement(p.H, p.L, p.A);
+
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.equator, g.E_2, g.V, g.A_e]);
   }
@@ -65,17 +70,22 @@ export class Proposition22 extends Model {
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     c.E_declination = proposition2(p.ascendentLongitude, p.obliquity);
     c.E_ortiveAmplitude = proposition7(c.E_declination, p.latitude);
     c.LEM = proposition17(p.ascendentLongitude, p.latitude, p.obliquity);
-    c.AL = TriangleSolver.opposite(c.E_ortiveAmplitude, 90 - c.LEM);
+    c.AH = TriangleSolver.hypoteneusFromAdjacent(c.E_ortiveAmplitude, 90 - c.LEM);
+    c.AL = TriangleSolver.opposite(c.E_ortiveAmplitude, c.AH);
     c.AE = 90 + c.AL;
+
+    this.setGeometryVisibility(p.arcLabels, [g.OE_label, g.HL_label, g.AL_label, g.HAL, g.LHA]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Ascendent Longitude', this.parameters, 'ascendentLongitude', -180, 180);
+    gui.addSlider('Ascendent Longitude', this.parameters, 'ascendentLongitude', 0, 360);
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90-this.parameters.obliquity);
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

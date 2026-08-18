@@ -2,7 +2,7 @@ import { distanceAlongArc, Point } from "../math/spherical";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -15,8 +15,9 @@ export class Proposition16 extends Model {
   constructor() {
     super();
     this.parameters = {
-      ecliptic_longitude: 120,
+      ecliptic_longitude: 130,
       obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -55,16 +56,23 @@ export class Proposition16 extends Model {
       angleK: new AngleElement(p.K, p.L, p.E),
     };
 
+    g.HA_label = new ArcLabel(p.H, p.A, { pole: p.E});
+    g.HK_label = new ArcLabel(p.H, p.K );
+
     this.createPointGeometries(p);
   }
 
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
+
+    this.setGeometryVisibility(p.arcLabels, [g.angleK, g.HA_label, g.HK_label]);
   }
 
   setupGui(gui) {
     gui.addSlider('Ecliptic Longitude', this.parameters, 'ecliptic_longitude', 0, 360);
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

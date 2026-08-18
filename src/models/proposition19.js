@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point } from "../mat
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -23,6 +23,7 @@ export class Proposition19 extends Model {
       ecliptic_longitude: -0,
       obliquity: 23.5,
       time: 8,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -58,6 +59,10 @@ export class Proposition19 extends Model {
       AKH: new RightAngle(p.K, p.A, p.H),
     };
 
+    g.AB_label = new ArcLabel(p.A, p.B, { pole: p.F });
+    g.LM_label = new ArcLabel(p.L, p.M, { pole: distanceAlongSmallCircle(p.H, p.M, 90, 0)});
+    g.angleHLE = new AngleElement(p.L, p.H, distanceAlongSmallCircle(p.V_p, p.L, 90));
+
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.F, g.V_p]);
   }
@@ -65,6 +70,7 @@ export class Proposition19 extends Model {
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     const AE = TriangleSolver.hypoteneusFromAdjacent(180 - p.eclipticAngle, p.eclipticAltitude);
     c.BE = TriangleSolver.opposite(180 - p.eclipticAngle, AE);
@@ -75,12 +81,16 @@ export class Proposition19 extends Model {
     c.KL = TriangleSolver.adjacent(c.HLK, 90 - p.altitude);
 
     this.altitudeSlider?.setRange(-Math.abs(90 - c.HK), Math.abs(90-c.HK));
+
+    this.setGeometryVisibility(p.arcLabels, [g.AB_label, g.LM_label, g.angleHLE, g.HAE]);
   }
 
   setupGui(gui) {
     gui.addSlider('Ecliptic Altitude', this.parameters, 'eclipticAltitude', 0, 90);
     gui.addSlider('Ecltitic Angle', this.parameters, 'eclipticAngle', 0, 90);
-    this.altitudeSlider = gui.addSlider('Point Altitude', this.parameters, 'altitude', 0, 90);
+    this.altitudeSlider = gui.addSlider('Point Altitude', this.parameters, 'altitude', 0, 90, {formatter: northSouthFormatter});
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
+    this.updateCalculations();
   }
 
 }

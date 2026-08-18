@@ -1,6 +1,6 @@
 import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { Equator } from "../geometry/great_circle";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Model } from "../core/model";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
@@ -20,6 +20,7 @@ export class Proposition13 extends Model {
       declination: 20,
       time: 6,
       obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = { }
@@ -49,6 +50,7 @@ export class Proposition13 extends Model {
     p.L = distanceAlongArc(p.E, p.D, () => this.calculations.EL);
     p.P = distanceAlongSmallCircle(p.H, p.L, 90, 0); 
     p.N = distanceAlongArc(p.H, p.P, () => this.calculations.HN);
+    p.Q = distanceAlongArc(p.C, p.E, () => this.parameters.time / 12 * 180 + 90);
 
     /// *** Geometry *** ///
 
@@ -70,24 +72,27 @@ export class Proposition13 extends Model {
     g.HNZ = new RightAngle(p.N, p.Z, p.H);
     g.HPL = new RightAngle(p.P, p.L, p.H);
     g.OLK = new AngleElement(p.L, p.O, p.K);
-    g.ZDL = new RightAngle(p.D, p.L, p.Z);
+    g.ZDL = new RightAngle(p.D, p.E, p.Z);
     g.OKL = new RightAngle(p.K, p.L, p.O);
 
 
     /// *** Labels *** ///
-    g.ZD_label = new Label(() => round(this.parameters.latitude, 1), distanceAlongArc(p.Z, p.D, () => this.parameters.latitude / 2));
-    g.MC_label = new Label(() => round(this.parameters.time / 6 * 90, 1), distanceAlongArc(p.C, p.E, () => this.parameters.time / 6 * 90 / 2));
-    g.HC_label = new Label(() => round(this.calculations.HN, 1), distanceAlongArc(p.H, p.N, () => this.calculations.HN / 2));
-    g.NP_label = new Label(() => round(90 - this.calculations.HN, 1), distanceAlongArc(p.N, p.P, () => (90 - this.calculations.HN) / 2));
-    g.LZ_label = new Label(() => round(this.calculations.ZL, 1), distanceAlongArc(p.L, p.Z, () => this.calculations.ZL / 2));
-    g.OK_label = new Label(() => round(this.calculations.OK, 1), distanceAlongArc(p.O, p.K, () => Math.abs(this.calculations.OK / 2)));
+    g.OM_label = new ArcLabel(p.M, p.O, { pole: p.Q, formatter: northSouthFormatter }),
+    g.OK_label = new ArcLabel(p.K, p.O, { pole: distanceAlongSmallCircle(p.H, p.K, -90, 0), formatter: northSouthFormatter}),
+    g.ZD_label = new ArcLabel(p.Z, p.D, { pole: p.E }),
+    g.MC_label = new ArcLabel(p.M, p.C, { pole: p.Z }),
+    // g.HC_label = new Label(() => round(this.calculations.HN, 1), distanceAlongArc(p.H, p.N, () => this.calculations.HN / 2));
+    // g.NP_label = new Label(() => round(90 - this.calculations.HN, 1), distanceAlongArc(p.N, p.P, () => (90 - this.calculations.HN) / 2));
+    // g.LZ_label = new Label(() => round(this.calculations.ZL, 1), distanceAlongArc(p.L, p.Z, () => this.calculations.ZL / 2));
 
     this.createPointGeometries(p);
+    this.setGeometryVisibility(false, [g.Q]);
   }
 
   updateCalculations() {
     const p = this.parameters;
     const c = this.calculations;
+    const g = this.geometry;
 
     const EM = 90 - p.time / 6 * 90;
     const ELM = acos(cos(EM) * sin(90 - p.latitude));
@@ -100,12 +105,15 @@ export class Proposition13 extends Model {
 
     const LO = c.ZL - (90 - p.declination);
     c.OK = asin(sin(90 - c.HN) * sin(LO));
+
+    this.setGeometryVisibility(p.arcLabels, [g.OM_label, g.OK_label, g.ZD_label, g.MC_label, g.OLK, g.OZD ]);
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
-    gui.addSlider('Declination', this.parameters, 'declination', -this.parameters.obliquity, this.parameters.obliquity);
-    gui.addSlider('Time', this.parameters, 'time', 0, 12);
+    gui.addSlider('Declination', this.parameters, 'declination', -this.parameters.obliquity, this.parameters.obliquity, {formatter: northSouthFormatter});
+    gui.addSlider('Solar Time', this.parameters, 'time', 0, 12, {formatter: (t) => round(t, 1).toString()});
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

@@ -1,8 +1,8 @@
-import { distanceAlongArc, Point } from "../math/spherical";
+import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -16,6 +16,8 @@ export class Proposition14 extends Model {
     this.parameters = {
       latitude: 40,
       declination: 20,
+      obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -50,8 +52,8 @@ export class Proposition14 extends Model {
       OE: new Arc(p.O, p.E),
       OM: new Arc(p.O, p.M),
       
-      altitudeLabel: new Label(() => round(c.altitude, 1), Point(0, () => c.altitude / 2)),
-      declinationLabel: new Label(() => round(this.parameters.declination, 1), distanceAlongArc(p.M, p.O, () => Math.abs(this.parameters.declination) / 2)),
+      altitudeLabel: new ArcLabel(p.O, p.E, { pole: p.D, formatter: northSouthFormatter }),
+      declinationLabel: new ArcLabel(p.M, p.O, { pole: distanceAlongSmallCircle(p.Z, p.M, -90, 0), formatter: northSouthFormatter }),
 
       // Angles
       angle_B: new RightAngle(p.B, p.A, p.E),
@@ -69,15 +71,18 @@ export class Proposition14 extends Model {
     const p = this.parameters;
     const g = this.geometry;
 
-    this.declinationSlider?.setRange(-Math.min(p.latitude, 23.5), Math.min(p.latitude, 23.5));
+    this.declinationSlider?.setRange(-Math.min(p.latitude, p.obliquity), Math.min(p.latitude, p.obliquity));
 
     c.altitude = asin(sin(p.declination) / sin(p.latitude));
     this.setGeometryVisibility(p.latitude != 0, [g.O, g.M, g.altitudeLabel]);
+    this.setGeometryVisibility(p.arcLabels, [g.altitudeLabel, g.declinationLabel, g.angle_E]);
   }
 
   setupGui(gui) {
+    const v = this.parameters;
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
-    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', 0, 23.5);
+    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', -v.obliquity, v.obliquity, {formatter: northSouthFormatter});
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

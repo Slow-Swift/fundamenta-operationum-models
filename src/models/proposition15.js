@@ -1,8 +1,8 @@
-import { distanceAlongArc, Point } from "../math/spherical";
+import { distanceAlongArc, distanceAlongSmallCircle, Point } from "../math/spherical";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -18,6 +18,7 @@ export class Proposition15 extends Model {
       latitude: 60,
       declination: 10,
       time: 8,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -53,17 +54,18 @@ export class Proposition15 extends Model {
       HO: new Arc(p.H, p.O),
 
       OSE: new Arc(p.E, p.S),
-      OS_label: new Label(() => round(c.OS, 1), distanceAlongArc(p.O, p.S, () => c.OS / 2)),
-      KE_label: new Label(() => round(c.KE, 1), distanceAlongArc(p.E, p.K, () => c.KE / 2)),
+      // OS_label: new Label(() => round(c.OS, 1), distanceAlongArc(p.O, p.S, () => c.OS / 2)),
+      KE_label: new ArcLabel(p.E, p.K, { pole: p.H, formatter: northSouthFormatter}),
+      ZD_label: new ArcLabel(p.Z, p.D, { pole: p.E }),
 
       // Labels
-      ZO_label: new Label(() => 90 - this.parameters.declination, distanceAlongArc(p.Z, p.O, () => (90 - this.parameters.declination) / 2)),
+      ZO_label: new ArcLabel(p.O, p.Z, { pole: distanceAlongSmallCircle(p.Z, p.O, -90, 0) }),
       
       // Angles
       angle_B: new RightAngle(p.B, p.A, p.E),
       angle_S: new RightAngle(p.S, p.Z, p.O),
       angle_Z: new AngleElement(p.Z, p.O, p.S),
-      angle_H: new AngleElement(p.H, p.O, p.S),
+      // angle_H: new AngleElement(p.H, p.O, p.S),
     };
 
     this.createPointGeometries(p);
@@ -73,18 +75,20 @@ export class Proposition15 extends Model {
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     const OZS = p.time * 180 / 12;
     c.OS = asin(sin(OZS) * sin(90 - p.declination));
     c.KE = acos(this.points.K().dot(this.points.E));
     const altitude = proposition13(p.declination, 180 - OZS, p.latitude);
-    console.log('--', c.KE, proposition15(p.declination, altitude, 180 - OZS));
+    this.setGeometryVisibility(p.arcLabels, [g.ZO_label, g.KE_label, g.ZD_label, g.angle_Z]);
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
-    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', -23.5, 23.5);
-    gui.addSlider('Time', this.parameters, 'time', 0, 12);
+    this.declinationSlider = gui.addSlider('Declination', this.parameters, 'declination', -23.5, 23.5, { formatter: northSouthFormatter });
+    gui.addSlider('Solar Time', this.parameters, 'time', 0, 12, { formatter: (t) => round(t, 1).toString()});
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

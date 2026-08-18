@@ -75,8 +75,9 @@ export class Proposition21 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Midheaven Longitude', this.parameters, 'midheavenLongitude', -180, 180);
+    gui.addSlider('Midheaven Longitude', this.parameters, 'midheavenLongitude', 0, 360);
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
+    // gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }
