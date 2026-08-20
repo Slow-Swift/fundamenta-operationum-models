@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,6 +20,7 @@ export class Proposition29 extends Model {
       eclipticLongitude: 60,
       declination: 10,
       obliquity: 23.5,
+      arcLabels: false,
     };
   }
 
@@ -48,7 +49,14 @@ export class Proposition29 extends Model {
     g.HL = new Arc(p.L, p.H);
 
     g.HLE = new AngleElement(p.L, p.H, p.E);
-    g.EKH = new AngleElement(p.K, p.H, p.E);
+    g.EKH = new RightAngle(p.K, p.H, p.E);
+  
+    g.LE = new ArcLabel(p.L, p.E, { pole: p.Z });
+    g.LH = new ArcLabel(p.L, p.H );
+    g.EK = new ArcLabel(p.E, p.K, { pole: p.Z });
+    g.HK = new ArcLabel(p.H, p.K);
+    g.HEK = new AngleElement(p.E, p.H, p.K);
+    g.ZD = new ArcLabel(p.D, p.Z, { pole: p.E, formatter: northSouthFormatter });
 
     this.createPointGeometries(p);
   }
@@ -56,6 +64,7 @@ export class Proposition29 extends Model {
   updateCalculations() {
     const p = this.points;
     const v = this.variables;
+    const g = this.geometry;
 
     v.declination = proposition2(v.eclipticLongitude, v.obliquity);
     v.rightAscension = proposition5(v.eclipticLongitude, v.obliquity);
@@ -65,13 +74,17 @@ export class Proposition29 extends Model {
     v.HEK = TriangleSolver.angleFromOppositeAndHypotenuse(v.declination, v.EH);
     if (v.EK < 0) v.HEK = 180 - v.HEK;
     v.latitude = 90 - v.HEK;
+
+    this.setGeometryVisibility(v.eclipticLongitude > 0, [ g.Z, g.ZK ]);
+    this.setGeometryVisibility(v.arcLabels && v.eclipticLongitude > 0, [ g.ZD ]);
+    this.setGeometryVisibility(v.arcLabels, [ g.LH, g.LE, g.EK, g.HK, g.HEK, g.HLE ]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Oblique Ascension', this.variables, 'obliqueAscension', 0.1, 90);
-    gui.addSlider('Ecliptic Longitude', this.variables, 'eclipticLongitude', 0.1, 179);
+    gui.addSlider('Oblique Ascension', this.variables, 'obliqueAscension', 0, 90);
+    gui.addSlider('Ecliptic Longitude', this.variables, 'eclipticLongitude', 0, 90);
+    gui.addToggle('Show Labels', this.variables, 'arcLabels');
   }
-
 }
 
 

@@ -8,6 +8,8 @@ import { LatitudeCircle } from "../geometry/latitude_circle";
 import { sin, cos, tan, asin, acos, atan } from "../math/degMath";
 import * as TriangleSolver from "../math/TriangleSolver";
 import { RightAngle } from "../geometry/right_angle";
+import { ArcLabel } from "../geometry/label";
+import { AngleElement } from "../geometry/angle_element";
 
 
 export class Proposition34 extends Model {
@@ -22,6 +24,7 @@ export class Proposition34 extends Model {
       latitude_2: 60,
       time: 0,
       longitude: 15,
+      showLabels: false,
     };
   }
 
@@ -49,6 +52,7 @@ export class Proposition34 extends Model {
     p.R = distanceAlongArc(p.X, p.T, () => v.XK - v.KL);
     p.L = distanceAlongArc(p.X, p.T, () => v.XK + v.KL);
     p.V = distanceAlongArc(p.K, distanceAlongSmallCircle(p.K, p.X, 90, 0), 90);
+    p.Q = distanceAlongArc(p.H, p.X, -15);
 
     const g = this.geometry = {
       sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
@@ -65,6 +69,7 @@ export class Proposition34 extends Model {
     g.SL = new Arc(p.S, p.L);
     g.XT = new Arc(p.X, p.T);
     g.TN = new Arc(p.T, p.N);
+    g.TZ = new Arc(p.T, p.Z);
     g.KZ = new Arc(p.K, p.Z);
     g.ZR = new Arc(p.Z, p.R);
     g.ZL = new Arc(p.Z, p.L);
@@ -75,10 +80,24 @@ export class Proposition34 extends Model {
     g.ZMX = new RightAngle(p.M, p.Z, p.X);
     g.TNX = new RightAngle(p.N, p.T, p.X);
     g.ZKT = new RightAngle(p.K, p.Z, p.T);
+    g.XLV = new RightAngle(p.L, p.X, p.V, { maxdst: 4 });
+    g.XRV = new RightAngle(p.R, p.X, p.V, { maxdst: 4 });
 
     g.tHorizon = new Equator(p.T, { thickness: 2, darkColor: 0xff0000});
     g.tMeridian = new Arc(p.T, p.Z, { length: 360, thickness: 2, darkColor: 0xff00ff})
     g.ecliptic = new Equator(p.E_p, { thickness: 2, darkColor: 0x0000ff });
+
+
+    // Labels
+    g.AX_label = new ArcLabel(p.A, p.X, { pole: p.E });
+    g.AXO = new AngleElement(p.X, p.A, p.O);
+    g.TZN = new AngleElement(p.Z, p.T, p.N);
+    g.TZ_label = new ArcLabel(p.T, p.Z);
+    g.TN_label = new ArcLabel(p.T, p.N);
+    g.XN_label = new ArcLabel(p.X, p.N);
+    g.TXN = new AngleElement(p.X, p.T, p.N);
+    g.ZK_label = new ArcLabel(p.K, p.Z);
+    g.ZLK = new AngleElement(p.L, p.Z, p.K);
 
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.ecliptic, g.tHorizon, g.tMeridian, g.E_p]);
@@ -86,6 +105,7 @@ export class Proposition34 extends Model {
 
   updateCalculations() {
     const v = this.variables;
+    const g= this.geometry;
     this.lat_x_slider?.setRange(0, 90-this.variables.obliquity);
     this.lat_t_slider?.setRange(this.variables.latitude_1, 90);
 
@@ -94,8 +114,8 @@ export class Proposition34 extends Model {
     v.XO = TriangleSolver.hypoteneusFromAdjacent(v.ZXH, v.latitude_1);
     v.TN = TriangleSolver.opposite(v.longitude, 90 - v.latitude_2);
     v.ZN = TriangleSolver.adjacent(v.longitude, 90 - v.latitude_2);
-    if (Math.abs(v.longitude) > 90) v.TN = Math.sign(v.TN) * 180 - v.TN;
-    if (Math.abs(v.longitude) > 90) v.ZN = 180 - v.ZN;
+    if (v.longitude > 90 && v.longitude < 270) v.TN = Math.sign(v.TN) * 180 - v.TN;
+    if (v.longitude > 90 && v.longitude < 270) v.ZN = 180 - v.ZN;
     v.XN = 90 - v.latitude_1 - v.ZN;
     v.XT = acos(cos(v.XN) * cos(v.TN));
     v.TXN = TriangleSolver.angleFromOppositeAndHypotenuse(v.TN, v.XT); // This is NAN when T == X. 
@@ -103,12 +123,15 @@ export class Proposition34 extends Model {
     v.XK = 90 - v.XS;
     v.ZK = TriangleSolver.opposite(v.TXN, 90 - v.latitude_1);
     v.KL = TriangleSolver.thirdSide(v.obliquity, v.ZK);
+
+    this.setGeometryVisibility(v.showLabels, [g.AX_label, g.XN_label, g.TZ_label, g.ZK_label, g.TN_label, g.AXO, g.TZN, g.ZLK, g.TXN]);
   }
 
   setupGui(gui) {
     this.lat_x_slider = gui.addSlider('Latitude X', this.variables, 'latitude_1', 0, 90);
     this.lat_t_slider = gui.addSlider('Latitude T', this.variables, 'latitude_2', 0, 90);
-    this.lon_slider = gui.addSlider('Longitude', this.variables, 'longitude', -180, 180);
+    this.lon_slider = gui.addSlider('Longitude', this.variables, 'longitude', 0, 360);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
     // gui.addSlider('Time', this.variables, 'time', 0, 24);
   }
 

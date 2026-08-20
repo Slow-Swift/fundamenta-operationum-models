@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,6 +20,7 @@ export class Proposition27 extends Model {
       latitude: 40,
       angleOfInclination: 40,
       obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -30,6 +31,7 @@ export class Proposition27 extends Model {
 
     const p = this.points = {};
 
+    p.F = Point(0, 0);
     p.E = Point(() => 90 - this.parameters.angleOfInclination, 0);
     p.B = Point(-90, 0); // Horizon Left
     p.D = Point(90, 0);  // Horizon Right
@@ -41,6 +43,8 @@ export class Proposition27 extends Model {
     p.C = Point(0, -90);
     p.L = Point(() => 90 - this.parameters.angleOfInclination, () => 90 - c.AL);
     p.H = distanceAlongArc(p.A, p.E, () => c.AH);
+    p.C_p = Point(() => 180 - this.parameters.angleOfInclination, 0);
+    p.H_c = distanceAlongArc(p.Z, p.H_p, () => Math.min(90, c.ZH));
 
     const g = this.geometry = {
       sphere: new SphereElement(new Vector3(0,0,0), {color: 0xfbe6c3, darkColor: 0x2d253c}),
@@ -54,16 +58,23 @@ export class Proposition27 extends Model {
       ZAL: new AngleElement(p.A, p.Z, p.L),
       ABE: new RightAngle(p.B, p.A, p.D),
       ALZ: new RightAngle(p.L, p.A, p.Z), 
-      angleOfInclinationHZD: new AngleElement(p.Z, p.H, p.D),
+      AZH: new AngleElement(p.Z, p.H_c, p.A),
     };
 
+    g.AZ_label = new ArcLabel(p.Z, p.A, { pole: p.F });
+    g.HZL = new AngleElement(p.Z, p.H_c, p.L);
+    g.AH_label = new ArcLabel(p.A, p.H, { pole: p.C_p });
+    g.HL_label = new ArcLabel(p.H, p.L, { pole: p.C_p });
+    g.LZ_label = new ArcLabel(p.Z, p.L);
+
     this.createPointGeometries(p);
-    this.setGeometryVisibility(false, [g.Z_p, g.H_p]);
+    this.setGeometryVisibility(false, [g.F, g.Z_p, g.H_p, g.H_c, g.C_p]);
   }
  
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     const AZH = 180 - p.time * 180 / 12;
 
@@ -74,8 +85,6 @@ export class Proposition27 extends Model {
       c.ZL = 180 - c.ZL;
       c.AL = 180 - c.AL;
     }
-
-    
 
     c.AZL = TriangleSolver.oppositeAngle(p.angleOfInclination, c.AL);
     c.HZL = p.angleOfInclination < 90 ? c.AZL - AZH : -c.AZL - AZH;
@@ -88,12 +97,15 @@ export class Proposition27 extends Model {
       c.AL = 0;
       c.AH = 0;
     }
+  
+    this.setGeometryVisibility(p.arcLabels, [g.AZ_label, g.AH_label, g.HL_label, g.LZ_label, g.ZAL, g.AZH, g.HZL]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Solar Time', this.parameters, 'time', 0, 12);
+    gui.addSlider('Solar Time', this.parameters, 'time', 0, 24, { formatter: (t) => round(t, 1).toString() });
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
     gui.addSlider('Angle of Inclination', this.parameters, 'angleOfInclination', 0, 180);
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

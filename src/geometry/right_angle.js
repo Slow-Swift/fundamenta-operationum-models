@@ -5,13 +5,14 @@ import { Label } from "./label";
 
 export class RightAngle extends LineElement {
   
-  constructor(center, leftPoint, rightPoint, { label=false, thickness=2, ...args}={}) {
+  constructor(center, leftPoint, rightPoint, { label=false, thickness=2, maxdst=7, ...args }={}) {
     super({thickness: thickness, ...args});
     this.center = center;
     this.leftPoint = leftPoint;
     this.rightPoint = rightPoint;
     this.showLabel = label;
     this.label = new Label();
+    this.maxdistance = maxdst;
     this.addChild(this.label);
   }
 
@@ -22,7 +23,7 @@ export class RightAngle extends LineElement {
 
     const leftDst = Math.abs(acos(center.clone().dot(leftPoint)));
     const rightDst = Math.abs(acos(center.clone().dot(rightPoint)));
-    const distance = Math.min(7, leftDst, rightDst)/2;
+    const distance = Math.min(this.maxdistance, leftDst, rightDst)/2;
 
     if (leftDst == 180 || rightDst == 180) return [[0,0,0]];
     if (Number.isNaN(distance) || distance < 0.02) {

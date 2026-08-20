@@ -1,8 +1,8 @@
-import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleArc } from "../math/spherical";
+import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, pole, smallCircleArc } from "../math/spherical";
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,6 +20,7 @@ export class Proposition28 extends Model {
       meridianInclination: 60,
       horizonInclination: 75,
       obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -30,6 +31,7 @@ export class Proposition28 extends Model {
 
     const p = this.points = {};
 
+    p.F = Point(0, 0);
     p.X = Point(0, 90);
     p.E = Point(() => 90 - c.ED, 0);
     p.A = Point(90, () => c.AD);
@@ -61,13 +63,17 @@ export class Proposition28 extends Model {
       HZD: new AngleElement(p.Z, p.H_p, p.D),
     };
 
+    g.XA_label = new ArcLabel(p.X, p.A, { pole: p.F });
+    g.AH_label = new ArcLabel(p.A, p.H, { pole: pole(p.A, p.A_p) });
+
     this.createPointGeometries(p);
-    this.setGeometryVisibility(false, [g.Z_p, g.H_p, g.A_c, g.A_p]);
+    this.setGeometryVisibility(false, [g.Z_p, g.H_p, g.A_c, g.A_p, g.F]);
   }
  
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     this.horizonSlider?.setRange(Math.max(0, 90 - p.meridianInclination, p.meridianInclination - 90), 180-Math.max(0, 90 - p.meridianInclination, p.meridianInclination - 90));
     const AZH = 180 - p.time * 180 / 12;
@@ -113,13 +119,15 @@ export class Proposition28 extends Model {
       c.AH = 0;
     }
 
+    this.setGeometryVisibility(p.arcLabels, [g.XA_label, g.AH_label, g.AED, g.DAE, g.HZD]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Solar Time', this.parameters, 'time', 0, 12);
+    gui.addSlider('Solar Time', this.parameters, 'time', 0, 24, { formatter: (t) => round(t, 1).toString() });
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
     gui.addSlider('Inclination to Meridian', this.parameters, 'meridianInclination', 0, 180);
     this.horizonSlider = gui.addSlider('Inclination to Horizon', this.parameters, 'horizonInclination', 0, 180);
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

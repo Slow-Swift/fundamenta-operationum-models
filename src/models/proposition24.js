@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -16,9 +16,10 @@ export class Proposition24 extends Model {
   constructor() {
     super();
     this.parameters = {
-      time: 3,
-      latitude: 30,
+      time: 5,
+      latitude: 50,
       obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -52,19 +53,26 @@ export class Proposition24 extends Model {
       KZD: new AngleElement(p.Z, p.K, p.D),
     };
 
+    g.ZD_label = new ArcLabel(p.Z, p.D, { pole: p.E });
+    g.DKZ = new AngleElement(p.K, p.Z, p.D);
+    g.DK_label = new ArcLabel(p.K, p.D, { pole: Point(0, 90)});
+
     this.createPointGeometries(p);
   }
  
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     c.EK = TriangleSolver.hypoteneusFromAdjacent(90 - p.latitude, 90 - p.time * 180 / 12);
+    this.setGeometryVisibility(p.arcLabels, [g.KZD, g.DKZ, g.ZD_label, g.DK_label]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Solar Time', this.parameters, 'time', 0, 12);
+    gui.addSlider('Solar Time', this.parameters, 'time', 0, 12, { formatter: (t) => round(t, 1).toString()});
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

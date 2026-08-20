@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -19,6 +19,7 @@ export class Proposition25 extends Model {
       time: 7.5,
       latitude: 50,
       obliquity: 23.5,
+      arcLabels: false,
     };
 
     this.calculations = {};
@@ -46,10 +47,14 @@ export class Proposition25 extends Model {
       hourCircle: new Arc(p.Z, () => this.parameters.latitude < 90 ? p.H() : Point(90 - this.parameters.time * 180 / 12, 0), {length: 180}),
 
       AED: new RightAngle(p.E, p.A, p.D),
-      ZAH: new RightAngle(p.A, p.Z, p.H),
+      ZAH: new RightAngle(p.A, p.D, p.E),
       ABE: new RightAngle(p.B, p.A, p.D),
       AZH: new AngleElement(p.Z, p.A, p.H),
     };
+
+    g.AHZ = new AngleElement(p.H, p.A, p.Z);
+    g.DZ = new ArcLabel(p.Z, p.D, { pole: p.E });
+    g.AH = new ArcLabel(p.A, p.H, p.D);
 
     this.createPointGeometries(p);
   }
@@ -57,15 +62,19 @@ export class Proposition25 extends Model {
   updateCalculations() {
     const c = this.calculations;
     const p = this.parameters;
+    const g = this.geometry;
 
     const AZH = 180 - p.time * 180 / 12;
     c.ZH = TriangleSolver.hypoteneusFromAdjacent(AZH, 90 - p.latitude);
     c.AH = TriangleSolver.opposite(AZH, c.ZH);
+
+    this.setGeometryVisibility(p.arcLabels, [g.AHZ, g.AZH, g.DZ, g.AH]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Solar Time', this.parameters, 'time', -12, 12);
+    gui.addSlider('Solar Time', this.parameters, 'time', 0, 24, { formatter: (t) => round(t, 1).toString()});
     gui.addSlider('Latitude', this.parameters, 'latitude', 0, 90);
+    gui.addToggle('Show Labels', this.parameters, 'arcLabels');
   }
 
 }

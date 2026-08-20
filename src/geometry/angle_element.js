@@ -5,7 +5,7 @@ import { degreeFormatter, Label } from "./label";
 
 export class AngleElement extends LineElement {
   
-  constructor(center, leftPoint, rightPoint, { label=true, thickness=2, alwaysSmallest=true, ...args}={}) {
+  constructor(center, leftPoint, rightPoint, { label=true, thickness=2, alwaysSmallest=true, maxdistance=7, ...args}={}) {
     super({thickness: thickness, ...args});
     this.center = center;
     this.leftPoint = leftPoint;
@@ -13,6 +13,7 @@ export class AngleElement extends LineElement {
     this.showLabel = label;
     this.label = new Label();
     this.alwaysSmallest = alwaysSmallest;
+    this.maxdistance = maxdistance;
     this.addChild(this.label);
   }
 
@@ -23,7 +24,7 @@ export class AngleElement extends LineElement {
 
     const leftDst = acos(center.clone().dot(leftPoint));
     const rightDst = acos(center.clone().dot(rightPoint));
-    const distance = Math.min(7, leftDst/3, rightDst/3);
+    const distance = Math.min(this.maxdistance, leftDst/3, rightDst/3);
 
     let poleLeft = projectToEquator(leftPoint, center);
     let poleRight = projectToEquator(rightPoint, center);

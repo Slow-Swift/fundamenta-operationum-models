@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -16,10 +16,11 @@ export class Proposition35 extends Model {
   constructor() {
     super();
     this.variables = {
-      latitude: 40,
-      meridianDistance: 90,
+      latitude: 50,
+      meridianDistance: 50,
       declination: 20,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -56,6 +57,14 @@ export class Proposition35 extends Model {
     g.ZMO = new RightAngle(p.M, Point(90, () => v.DM - 90), p.O);
     g.ZHO = new RightAngle(p.H, p.Z, p.O);
 
+    g.AK_label = new ArcLabel(p.A, p.K, { pole: p.Z });
+    g.OK_label = new ArcLabel(p.O, p.K);
+    g.ZH_label = new ArcLabel(p.Z, p.H);
+    g.OM_label = new ArcLabel(p.O, p.M);
+    g.DM_label = new ArcLabel(p.D, p.Z, { pole: p.E, formatter: northSouthFormatter });
+    g.ZM_label = new ArcLabel(p.M, p.Z, { pole: p.E });
+    g.ODM = new AngleElement(p.D, p.O, p.M);
+
     this.createPointGeometries(p);
   }
  
@@ -76,12 +85,15 @@ export class Proposition35 extends Model {
     if (v.DM > 180) v.DH = 180 - v.DH;
 
     this.setGeometryVisibility(!(v.meridianDistance == 0 || v.meridianDistance == 180), [g.H, g.ZHO, g.ZH]);
+    this.setGeometryVisibility(v.showLabels, [g.AK_label, g.OK_label, g.OM_label, g.DM_label, g.ZM_label, g.ODM]);
+    this.setGeometryVisibility(!(v.meridianDistance == 0 || v.meridianDistance == 180) && v.showLabels, [g.ZH_label])
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
     gui.addSlider('Meridian Distance', this.variables, 'meridianDistance', 0, 180);
-    gui.addSlider('Declination', this.variables, 'declination', -this.variables.obliquity, this.variables.obliquity);
+    gui.addSlider('Declination', this.variables, 'declination', -this.variables.obliquity, this.variables.obliquity, { formatter: northSouthFormatter });
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }
