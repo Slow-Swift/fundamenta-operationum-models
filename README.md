@@ -11,8 +11,8 @@ in Fundamenta Operationum.
 
 ## Viewing the models
 
-The full set of models can be viewed [here](https://slow-swift.github.io/fundamenta-operationum-models/threejs_models.html.
-Examples of how these models look when embedded in a website can be seen [here](https://slow-swift.github.io/fundamenta-operationum-models).
+The full set of models can be viewed [here](https://slow-swift.github.io/fundamenta-operationum-models/threejs_models.html).
+Examples of how these models look when embedded in a website can be seen [here](https://slow-swift.github.io/fundamenta-operationum-models/).
 
 ## Embedding models in your own site
 
