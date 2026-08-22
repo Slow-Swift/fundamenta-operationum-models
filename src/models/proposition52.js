@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -18,7 +18,8 @@ export class Proposition52 extends Model {
     super();
     this.variables = {
       latitude: 50,
-      radius: 60
+      radius: 60,
+      showLabels: false,
     };
   }
 
@@ -42,6 +43,10 @@ export class Proposition52 extends Model {
     g.OA = new Arc(p.O, p.A);
     g.OB = new Arc(p.O, p.B);
 
+    g.OA_label = new ArcLabel(p.O, p.A);
+    g.OC_label = new ArcLabel(p.O, p.C);
+    g.AC_label = new ArcLabel(p.A, p.C);
+
     this.createPointGeometries(p);
   }
  
@@ -53,10 +58,12 @@ export class Proposition52 extends Model {
     v.CA = TriangleSolver.thirdSide(v.radius, v.latitude);
 
     this.setGeometryVisibility(v.latitude <= v.radius, [g.A, g.B, g.OA, g.OB]);
+    this.setGeometryVisibility(v.showLabels, [ g.OA_label, g.OC_label, g.AC_label ]);
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

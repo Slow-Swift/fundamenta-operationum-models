@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -19,6 +19,7 @@ export class Proposition51_Case1 extends Model {
       longitudeA: 50,
       longitudeB: 130,
       latitude: 30,
+      showLabels: false,
     };
   }
 
@@ -33,22 +34,31 @@ export class Proposition51_Case1 extends Model {
 
     p.Z = Point(0, 90);
     p.H = Point(-90, 0);
-    p.P = Point(0,0);
     p.K = Point(90, 0);
     p.L = Point(() => v.longitudeA - 90, 0);
     p.M = Point(() => v.longitudeB - 90, 0);
     p.N = distanceAlongArc(p.L, p.Z, () => v.latitude);
     p.O = distanceAlongArc(p.M, p.Z, () => v.latitude);
-    p.Q_e = Point(() => (v.longitudeA + v.longitudeB) / 2 - 90 * (v.ZQ >= 0 ? 1 : -1), 0);
-    p.Q = distanceAlongArc(p.Q_e, p.Z, () => 90 - Math.abs(v.ZQ));
+    p.P = Point(() => (v.longitudeA + v.longitudeB) / 2 - 90 * (v.ZQ >= 0 ? 1 : -1), 0);
+    p.Q = distanceAlongArc(p.P, p.Z, () => 90 - Math.abs(v.ZQ));
 
     g.ZL = new Arc(p.Z, p.L);
     g.ZM = new Arc(p.Z, p.M);
-    g.ZQ = new Arc(p.Z, p.Q_e, {length: 180})
+    g.ZQ = new Arc(p.Z, p.P, {length: 180})
     g.LN = new Arc(p.L, p.N);
     g.MO = new Arc(p.M, p.O);
     g.NQ = new Arc(p.N, p.Q);
     g.OQ = new Arc(p.O, p.Q);
+
+    g.NLP = new RightAngle(p.L, p.N, p.P);
+    g.OMP = new RightAngle(p.M, p.O, p.P);
+    g.QPL = new RightAngle(p.P, p.Q, p.L);
+    g.ZQN = new RightAngle(p.Q, p.Z, p.N);
+
+    g.NL_label = new ArcLabel(p.N, p.L, { pole: Point(() => v.longitudeA, 0), formatter: northSouthFormatter });
+    g.NZQ = new AngleElement(p.Z, p.L, p.P);
+    g.NQ_label = new ArcLabel(p.N, p.Q);
+
     this.createPointGeometries(p);
   }
  
@@ -60,12 +70,15 @@ export class Proposition51_Case1 extends Model {
     v.ZQ = TriangleSolver.adjacent((v.longitudeB - v.longitudeA) / 2, 90 - v.latitude);
     if (Math.abs(v.longitudeB  - v.longitudeA) > 180) v.ZQ = 180 - v.ZQ;
     v.ZQ = mod(v.ZQ + 180, 360) - 180;
+
+    this.setGeometryVisibility(v.showLabels, [ g.NL_label, g.NQ_label, g.NZQ ]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Longitude A', this.variables, 'longitudeA', 0, 360);
-    gui.addSlider('Longitude B', this.variables, 'longitudeB', 0, 360);
-    gui.addSlider('Latitude', this.variables, 'latitude', -90, 90);
+    gui.addSlider('Longitude N', this.variables, 'longitudeA', 0, 360);
+    gui.addSlider('Longitude O', this.variables, 'longitudeB', 0, 360);
+    gui.addSlider('Latitude', this.variables, 'latitude', -90, 90, { formatter: northSouthFormatter });
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

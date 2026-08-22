@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -18,7 +18,8 @@ export class Proposition56 extends Model {
     super();
     this.variables = {
       dayLength: 15, 
-      obliquity: 23.5
+      obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -43,6 +44,10 @@ export class Proposition56 extends Model {
     g.equator = new Equator(p.Z);
     g.ZK = new Arc(p.Z, p.K);
     
+    g.EK_label = new ArcLabel(p.E, p.K);
+    g.HK_label = new ArcLabel(p.H, p.K);
+    g.HEK = new AngleElement(p.E, p.H, p.K);
+    g.ZD = new ArcLabel(p.D, p.Z, { pole: p.E, formatter: northSouthFormatter });
 
     this.createPointGeometries(p);
   }
@@ -56,10 +61,13 @@ export class Proposition56 extends Model {
     v.EH = acos(cos(v.EK) * cos(v.obliquity));
     v.AB = TriangleSolver.angleFromOppositeAndHypotenuse(v.obliquity, v.EH);
     v.latitude = 90 - v.AB;
+
+    this.setGeometryVisibility(v.showLabels, [ g.EK_label, g.HK_label, g.HEK, g.ZD ]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Day Length', this.variables, 'dayLength', 12, 24);
+    gui.addSlider('Day Length', this.variables, 'dayLength', 12, 24, { formatter: (t) => round(t, 1).toString() });
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

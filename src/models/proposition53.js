@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -21,7 +21,8 @@ export class Proposition53 extends Model {
       starLatitude: 10, 
       starLongitude: 50,
       arcOfVision: 13,
-      obliquity: 23.5
+      obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -51,7 +52,7 @@ export class Proposition53 extends Model {
     p.H = distanceAlongSmallCircle(p.Z, p.E, () => v.EH, 0);
     p.K = distanceAlongArc(p.V, p.V_c, () => v.starLongitude + v.LK);
     p.A = distanceAlongSmallCircle(p.Y, p.F, -90, 0);
-    p.D = distanceAlongSmallCircle(p.Y, p.F, 90, 0);
+    p.C = distanceAlongSmallCircle(p.Y, p.F, 90, 0);
 
     g.arcticCircle = new LatitudeCircle(p.X, 90 - v.obliquity);
     g.equator = new Equator(p.X, {thickness: 2});
@@ -62,6 +63,22 @@ export class Proposition53 extends Model {
     g.XY = new Arc(p.X, p.Y);
     g.ZK = new Arc(p.Z, p.K);
 
+    g.EHK = new RightAngle(p.H, p.E, p.K);
+    g.YMX = new RightAngle(p.M, p.Y, p.X);
+    g.ELO = new RightAngle(p.L, p.E, p.O);
+
+    g.HK_label = new ArcLabel(p.H, p.K);
+    g.HEK = new AngleElement(p.E, p.H, p.K);
+    g.EL_label = new ArcLabel(p.E, p.L);
+    g.XD_label = new ArcLabel(p.X, p.D);
+    g.XO_label = new ArcLabel(p.X, p.O);
+    g.XOD = new AngleElement(p.O, p.X, p.D);
+    g.MYX = new AngleElement(p.Y, p.M, p.X);
+    g.MX_label = new ArcLabel(p.M, p.X);
+    g.XY_label = new ArcLabel(p.Y, p.X);
+    g.XOM = new AngleElement(p.O, p.X, p.M);
+    g.LO_label = new ArcLabel(p.L, p.O);
+    g.LK_label = new ArcLabel(p.L, p.K);
 
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.equator, g.V, g.V_c, g.F]);
@@ -98,6 +115,7 @@ export class Proposition53 extends Model {
 
     if (v.starLongitude > 180) v.YM = 180-v.YM;
   
+    this.setGeometryVisibility(v.showLabels, [ g.LO_label, g.EL_label, g.LK_label, g.HEK, g.HK_label, g.XOD, g.XOM, g.XO_label, g.XD_label, g.MX_label, g.XY_label, g.MYX]);
 
     // v.VJ = TriangleSolver.hypoteneusFromAdjacent(v.obliquity, v.starLongitude);
     // v.OJ = TriangleSolver.opposite(v.obliquity, v.VJ) + v.starLatitude;
@@ -108,10 +126,11 @@ export class Proposition53 extends Model {
 
   setupGui(gui) {
     const v = this.variables;
-    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90 - v.obliquity);
+    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90 - v.obliquity, { formatter: northSouthFormatter });
     gui.addSlider('Star Longitude', this.variables, 'starLongitude', 0, 90);
-    this.starLatitudeSlider = gui.addSlider('Star Latitude', this.variables, 'starLatitude', 0, 90);
+    this.starLatitudeSlider = gui.addSlider('Star Latitude', this.variables, 'starLatitude', 0, 90, { formatter: northSouthFormatter });
     this.aovSlider = gui.addSlider('Arc of Vision', this.variables, 'arcOfVision', 0, 20);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

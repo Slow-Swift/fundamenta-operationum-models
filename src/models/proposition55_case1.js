@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,7 +20,8 @@ export class Proposition55_Case1 extends Model {
       radius: 20, 
       argument: 30,
       obliquity8: 23.77,
-      obliquity9: 23.6
+      obliquity9: 23.6,
+      showLabels: false,
     };
   }
 
@@ -53,6 +54,12 @@ export class Proposition55_Case1 extends Model {
     g.KLG = new RightAngle(p.L, p.K, p.C);
     g.BHE = new RightAngle(p.H, p.B, p.E);
 
+    g.BEH = new AngleElement(p.E, p.B, p.H);
+    g.BE_label = new ArcLabel(p.B, p.E);
+    g.HGB = new AngleElement(p.G, p.B, p.H);
+    g.BH_label = new ArcLabel(p.B, p.H);
+    g.GB_label = new ArcLabel(p.G, p.B);
+
     this.createPointGeometries(p);
   }
  
@@ -76,12 +83,13 @@ export class Proposition55_Case1 extends Model {
     v.EL = TriangleSolver.adjacent(v.obliquity9, v.EK);
 
     this.setGeometryVisibility(v.radius > 0, [g.K, g.L, g.KL, g.GB, g.equator, g.DE]);
-    
+    this.setGeometryVisibility(v.showLabels, [ g.GB_label, g.BH_label, g.HGB, g.BE_label, g.BEH ]); 
   }
 
   setupGui(gui) {
     gui.addSlider('Radius', this.variables, 'radius', 0, this.variables.obliquity8);
     gui.addSlider('Aries', this.variables, 'argument', 0, 360);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

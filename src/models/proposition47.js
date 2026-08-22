@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -10,6 +10,7 @@ import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
 import { proposition14, proposition16, proposition2, proposition5 } from "../math/propositions";
+import { warn } from "jsxgraph";
 
 export class Proposition47 extends Model {
 
@@ -19,6 +20,7 @@ export class Proposition47 extends Model {
       starLongitude: 150,
       starLatitude: 20,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -67,6 +69,15 @@ export class Proposition47 extends Model {
     g.HNO = new RightAngle(p.N, p.X, p.O);
     g.KME = new RightAngle(p.M, p.K, p.E);
 
+    g.OXN = new AngleElement(p.X, p.H, p.Z);
+    g.OH_label = new ArcLabel(p.O, p.H);
+    g.ZO_label = new ArcLabel(p.Z, p.O);
+    g.NO_label = new ArcLabel(p.N, p.O);
+    g.NZO = new AngleElement(p.Z, p.N, p.O);
+    g.SX_label = new ArcLabel(p.S, p.X);
+    g.ZX_label = new ArcLabel(p.Z, p.X);
+    g.KE_label = new ArcLabel(p.K, p.E);
+
     this.createPointGeometries(p);
   }
  
@@ -79,6 +90,7 @@ export class Proposition47 extends Model {
     v.ON = TriangleSolver.opposite(v.NXH, 90 - v.starLatitude);
     v.XN = TriangleSolver.adjacent(v.NXH, 90 - v.starLatitude);
     if (v.NXH > 90) v.XN = mod(360 - v.XN, 360) - 180;
+    if (v.starLatitude == 90) v.XN = 0;
     v.HL = TriangleSolver.adjacent(v.NXH, v.obliquity);
     if (v.NXH > 90) v.HL = 180 - v.HL;
     v.BL = TriangleSolver.opposite(v.NXH, 90 + v.HL);
@@ -96,11 +108,14 @@ export class Proposition47 extends Model {
     v.EQ = TriangleSolver.hypoteneusFromAdjacent(v.obliquity, 90-v.AZO);
     v.HQ = 90 - v.NXH + v.EQ;
     v.QP = TriangleSolver.hypoteneusFromAdjacent(v.EQR, v.HQ);
+
+    this.setGeometryVisibility(v.showLabels, [ g.KE_label, g.NO_label, g.ZO_label, g.ZX_label, g.OH_label, g.SX_label, g.OXN, g.NZO ]);
   }
 
   setupGui(gui) {
     gui.addSlider('Star Longitude', this.variables, 'starLongitude', 90, 270);
-    gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90);
+    gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90, { formatter: northSouthFormatter });
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

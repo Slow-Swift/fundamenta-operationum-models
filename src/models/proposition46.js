@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -10,6 +10,7 @@ import { RightAngle } from "../geometry/right_angle";
 import { AngleElement } from "../geometry/angle_element";
 import * as TriangleSolver from "../math/TriangleSolver";
 import { proposition14, proposition16, proposition2, proposition5, proposition6 } from "../math/propositions";
+import { warn } from "jsxgraph";
 
 export class Proposition46 extends Model {
 
@@ -19,6 +20,7 @@ export class Proposition46 extends Model {
       starLongitude: 150,
       starLatitude: 20,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -59,6 +61,14 @@ export class Proposition46 extends Model {
     g.XHA = new RightAngle(p.H, p.X, p.A);
     g.ZNX = new RightAngle(p.N, p.Z, p.X);
 
+    g.ZXN = new AngleElement(p.X, p.N, p.Z);
+    g.ZX_label = new ArcLabel(p.Z, p.X);
+    g.ZN_label = new ArcLabel(p.Z, p.N);
+    g.ZON = new AngleElement(p.O, p.Z, p.N);
+    g.ZO_label = new ArcLabel(p.O, p.Z);
+    g.LM = new ArcLabel(p.L, p.M);
+    g.HK = new ArcLabel(p.H, p.K);
+
     this.createPointGeometries(p);
   }
  
@@ -74,19 +84,21 @@ export class Proposition46 extends Model {
     v.XN = TriangleSolver.adjacent(v.AH, v.obliquity);
     if (v.AH > 90) v.XN = 180 - v.XN;
     if (v.AH > 90) v.ZN = 180 - v.ZN;
+    if (v.starLongitude == 360) v.XN = 0;
     v.NO = 90 - v.starLatitude - v.XN;
     v.ZO = acos(cos(v.ZN) * cos(v.NO));
     v.NOZ = TriangleSolver.angleFromOppositeAndHypotenuse(v.ZN, v.ZO);
     v.HOK = mod(v.XN + 180, 360)-180 < 90 - v.starLatitude ? v.NOZ : 180 - v.NOZ;
     v.OK = TriangleSolver.hypoteneusFromAdjacent(v.HOK, v.starLatitude);
-    console.log(v.NOZ, mod(v.XN + 180, 360)-180, v.NO);
 
     this.setGeometryVisibility(v.starLongitude != 360, [g.N, g.XN]);
+    this.setGeometryVisibility(v.showLabels, [ g.ZX_label, g.ZN_label, g.ZO_label, g.HK, g.LM, g.ZON, g.ZXN]);
   }
 
   setupGui(gui) {
     gui.addSlider('Star Longitude', this.variables, 'starLongitude', 0, 360);
-    gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90);
+    gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90, { formatter: northSouthFormatter });
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

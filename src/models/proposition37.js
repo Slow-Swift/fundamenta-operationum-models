@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -16,9 +16,10 @@ export class Proposition37 extends Model {
   constructor() {
     super();
     this.variables = {
-      latitude: 40,
-      elevation: 60,
+      latitude: 60,
+      elevation: 50,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -53,6 +54,11 @@ export class Proposition37 extends Model {
     g.ZH = new Arc(p.Z, p.H);
     g.ZHD = new RightAngle(p.H, p.Z, p.D);
 
+    g.XK_label = new ArcLabel(p.X, p.K, { pole: p.D });
+    g.ZDH = new AngleElement(p.D,  p.Z, p.H);
+    g.ZH_label = new ArcLabel(p.Z, p.H);
+    g.ZD_label = new ArcLabel(p.D, p.Z, { pole: p.E, formatter: northSouthFormatter });
+
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.T]);
   }
@@ -65,11 +71,15 @@ export class Proposition37 extends Model {
     v.ZH = TriangleSolver.opposite(v.elevation, v.latitude);
     v.DH = TriangleSolver.adjacent(v.elevation, v.latitude);
     v.AO = acos(cos(v.elevation) / cos(v.ZH));
+
+    this.setGeometryVisibility(v.showLabels, [ g.XK_label, g.ZD_label, g.ZDH ]);
+    this.setGeometryVisibility(v.showLabels && v.elevation < 90, [ g.ZH_label ]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
+    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90, { formatter: northSouthFormatter });
     this.elevationSlider = gui.addSlider('Zenith Elevation', this.variables, 'elevation', 0, 90);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

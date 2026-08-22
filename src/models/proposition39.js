@@ -1,8 +1,8 @@
-import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleArc } from "../math/spherical";
+import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, pole, smallCircleArc } from "../math/spherical";
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -23,6 +23,7 @@ export class Proposition39 extends Model {
       latitudeH: 20,
       longitude: 60,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -57,6 +58,14 @@ export class Proposition39 extends Model {
     g.ALZ = new RightAngle(p.L, p.A, p.Z);
     g.XKH = new RightAngle(p.K, p.X, p.H);
 
+    g.KHX = new AngleElement(p.X, distanceAlongSmallCircle(p.E, p.X, () => v.XK/1.25, 0), p.X_p);
+    g.XH_label = new ArcLabel(p.X, p.H, { pole: distanceAlongSmallCircle(p.X, Point(-90, 0), () => v.angleOfPosition + 90, 0) });
+    g.KH_label = new ArcLabel(p.K, p.H);
+    g.XK_label = new ArcLabel(p.X, p.K, { pole: p.E });
+    g.ZH_label = new ArcLabel(p.Z, p.H, { pole: pole(p.Z, p.L) });
+    g.ZXH = new AngleElement(p.Z, p.X, () => Math.abs(v.XH) < 160 ? p.H() : p.L());
+    g.XZ_label = new ArcLabel(p.Z, p.X, { pole: p.E});
+
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.E, g.X_p])
   }
@@ -72,12 +81,15 @@ export class Proposition39 extends Model {
 
     this.setGeometryVisibility(v.distance != 180, [ g.XK ]);
     this.setGeometryVisibility(v.angleOfPosition != 0 && v.angleOfPosition != 180, [ g.L, g.LH, g.ZL, g.ALZ ]);
+
+    this.setGeometryVisibility(v.showLabels, [g.KHX, g.XH_label, g.KH_label, g.XK_label, g.ZH_label, g.ZXH, g.XZ_label ]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Latitude X', this.variables, 'latitudeX', 0, 90);
+    gui.addSlider('Latitude X', this.variables, 'latitudeX', 0, 90, { formatter: northSouthFormatter });
     gui.addSlider('Angle of Position', this.variables, 'angleOfPosition', 0, 180);
     gui.addSlider('Distance', this.variables, 'distance', 0, 180);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

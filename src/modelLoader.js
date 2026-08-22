@@ -1,5 +1,6 @@
 import { models } from './models/models';
 import { ModelRenderer } from './core/model-renderer';
+import './style.css';
 
 function setupModel(element) {
   const modelName = element.attributes?.model?.value;
@@ -16,9 +17,11 @@ function setupModel(element) {
   let minZoom = Number(element.attributes['min-zoom']?.value ?? 0);
   if (Number.isNaN(minZoom)) maxZoom = 0;
 
+  let ctrlsVisible = element.attributes['show-controls'] ?? false;
+
   const modelClass = models[modelName];
   const model = new modelClass();
-  const modelRenderer = new ModelRenderer(model, size, maxZoom, minZoom);
+  const modelRenderer = new ModelRenderer(model, size, maxZoom, minZoom, ctrlsVisible);
   element.appendChild(modelRenderer.domElement);
   modelRenderer.resize();
   modelRenderer.updateTheme();

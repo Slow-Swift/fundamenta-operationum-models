@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,7 +20,8 @@ export class Proposition55_Case2 extends Model {
       radius: 20, 
       argument: 30,
       obliquity8: 23.77,
-      obliquity9: 23.6
+      obliquity9: 23.6,
+      showLabels: false,
     };
   }
 
@@ -56,6 +57,7 @@ export class Proposition55_Case2 extends Model {
 
     g.KLG = new RightAngle(p.L, p.K, p.C);
     g.BNE = new RightAngle(p.N, p.B, p.E);
+    g.BHE = new RightAngle(p.H, p.B, p.E);
 
     this.createPointGeometries(p);
   }

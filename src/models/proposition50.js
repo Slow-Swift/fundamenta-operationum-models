@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -19,7 +19,8 @@ export class Proposition50 extends Model {
       latitude: 60,
       altitude: 50,
       meridianDistance: 60,
-      obliquity: 23.5
+      obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -53,6 +54,17 @@ export class Proposition50 extends Model {
     g.OK = new Arc(p.O, p.K);
 
     g.ZNO = new RightAngle(p.N, p.Z, p.O);
+    g.OKA = new RightAngle(p.K, p.O, p.A);
+    g.ABE = new RightAngle(p.B, p.A, p.E);
+
+    g.OH_label = new ArcLabel(p.O, p.H);
+    g.NZO = new AngleElement(p.Z, () => v.altitude >= 0 ? p.N() : (v.meridianDistance <= 90 ? p.B : p.D), () => v.altitude >= 0 ? p.O() : p.H());
+    g.NO_label = new ArcLabel(p.N, p.O);
+    g.NZ_label = new ArcLabel(p.N, p.Z);
+    g.ZX_label = new ArcLabel(p.Z, p.X);
+    g.AK_label = new ArcLabel(p.A, p.K, { pole: p.X });
+    g.OK_label = new ArcLabel(p.O, p.K);
+     
 
     this.createPointGeometries(p);
   }
@@ -70,12 +82,15 @@ export class Proposition50 extends Model {
     v.XO = acos(cos(v.NX) * cos(v.NO));
     v.AK = TriangleSolver.angleFromOppositeAndHypotenuse(v.NO, v.XO);
     if (v.NX > 180) v.AK = 180 - v.AK;
+
+    this.setGeometryVisibility(v.showLabels, [ g.OH_label, g.NO_label, g.NZ_label, g.ZX_label, g.AK_label, g.OK_label, g.NZO ]);
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
-    gui.addSlider('Altitude', this.variables, 'altitude', -90, 90);
+    gui.addSlider('Altitude', this.variables, 'altitude', -90, 90, { formatter: northSouthFormatter });
     gui.addSlider('Meridian Distance', this.variables, 'meridianDistance', 0, 180);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

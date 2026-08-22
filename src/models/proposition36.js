@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -16,11 +16,10 @@ export class Proposition36 extends Model {
   constructor() {
     super();
     this.variables = {
-      latitude: 40,
-      elevation: 20,
-      meridianDistance: 90,
-      declination: 20,
+      latitude: 60,
+      elevation: 40,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -52,6 +51,11 @@ export class Proposition36 extends Model {
     g.ZQ = new Arc(p.Z, p.Q);
     g.ZHD = new RightAngle(p.H, p.Z, p.D);
 
+    g.ZH_label = new ArcLabel(p.Z, p.H);
+    g.ZD_label = new ArcLabel(p.D, p.Z, { pole: p.E, formatter: northSouthFormatter });
+    g.ZDH = new AngleElement(p.D, p.Z, p.H);
+    g.AO_label = new ArcLabel(p.A, p.O, { pole: p.Z });
+
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.O_p, g.T, g.X]);
   }
@@ -67,11 +71,15 @@ export class Proposition36 extends Model {
     v.DH = TriangleSolver.adjacent(v.ZDO, v.latitude);
     v.DZH = TriangleSolver.oppositeAngle(v.ZDO, v.DH);
     v.AO = acos(cos(v.ZDO) / cos(v.elevation));
+
+    this.setGeometryVisibility(v.showLabels, [g.ZD_label, g.ZDH, g.AO_label]);
+    this.setGeometryVisibility(v.showLabels && v.elevation < v.latitude, [g.ZH_label]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
+    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90, { formatter: northSouthFormatter });
     this.elevationSlider = gui.addSlider('Pole Elevation', this.variables, 'elevation', 0, 90);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

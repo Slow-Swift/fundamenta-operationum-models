@@ -1,8 +1,8 @@
-import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleArc } from "../math/spherical";
+import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, pole, smallCircleArc } from "../math/spherical";
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,6 +20,7 @@ export class Proposition38 extends Model {
       latitudeH: 20,
       longitude: 60,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -53,6 +54,13 @@ export class Proposition38 extends Model {
     g.XKH = new RightAngle(p.K, p.X, p.H);
     g.ALZ = new RightAngle(p.L, p.Z, p.A);
 
+    g.XZH = new AngleElement(p.Z, p.X, p.L);
+    g.HZ_label = new ArcLabel(p.Z, () => v.latitudeH >= 0 ? p.H() : p.K(), { pole: pole(p.Z, p.L) });
+    g.HK_label = new ArcLabel(p.H, () => v.latitudeH >= 0 || v.ZK <= 180 ? p.K() : p.Z());
+    g.XK_label = new ArcLabel(p.X, p.K);
+    g.AK_label = new ArcLabel(p.A, () => v.latitudeH >= 0 && v.latitudeX > 90 - (mod(v.ZK + 180, 360)-180) ? p.K() : p.X );
+    g.XH_label = new ArcLabel(p.X, p.H);
+
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.E])
   }
@@ -70,16 +78,18 @@ export class Proposition38 extends Model {
       v.ZK = TriangleSolver.adjacent(v.longitude, 90 - v.latitudeX);
       if (v.longitude > 90) v.ZK = 180 - v.ZK;
     }
-
+  
     this.setGeometryVisibility(v.latitudeH >= 0, [ g.HK ]);
     this.setGeometryVisibility(v.latitudeH < 0, [ g.ZK, g.XK ]);
     this.setGeometryVisibility(p.H().dot(p.X) > -1, [g.XH]);
+    this.setGeometryVisibility(v.showLabels, [g.XZH, g.HZ_label, g.HK_label, g.XK_label, g.AK_label, g.XH_label ]);
   }
 
   setupGui(gui) {
-    gui.addSlider('Latitude X', this.variables, 'latitudeX', 0, 90);
-    gui.addSlider('Latitude H', this.variables, 'latitudeH', -90, 90);
+    gui.addSlider('Latitude X', this.variables, 'latitudeX', 0, 90, { formatter: northSouthFormatter });
+    gui.addSlider('Latitude H', this.variables, 'latitudeH', -90, 90, { formatter: northSouthFormatter });
     gui.addSlider('Delta Longitude', this.variables, 'longitude', 0, 180);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

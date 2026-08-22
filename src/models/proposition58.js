@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -17,7 +17,8 @@ export class Proposition58 extends Model {
   constructor() {
     super();
     this.variables = {
-      obliquity: 23.5
+      obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -40,6 +41,11 @@ export class Proposition58 extends Model {
     g.ZB = new Arc(p.Z, p.B);
     g.ZK = new Arc(p.Z, p.K);
 
+    g.ZH_label = new ArcLabel(p.Z, p.H);
+    g.ZA_label = new ArcLabel(p.Z, p.A);
+    g.HE_label = new ArcLabel(p.H, p.E);
+    g.KE_label = new ArcLabel(p.K, p.E);
+
     this.createPointGeometries(p);
   }
  
@@ -51,9 +57,12 @@ export class Proposition58 extends Model {
     v.ZH = asin(Math.sqrt(sin(90 - v.obliquity)));
     v.HK = 90 - v.ZH;
     v.EH = proposition3(v.HK, v.obliquity);
+
+    this.setGeometryVisibility(v.showLabels, [ g.ZH_label, g.ZA_label, g.HE_label, g.KE_label ]);
   }
 
   setupGui(gui) {
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

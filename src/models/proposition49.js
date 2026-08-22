@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -18,6 +18,7 @@ export class Proposition49 extends Model {
     this.variables = {
       latitude: 60,
       starDeclination: 20,
+      showLabels: false,
     };
   }
 
@@ -34,12 +35,12 @@ export class Proposition49 extends Model {
     p.B = Point(-90, 0);
     p.D = Point(90, 0);
     p.A = Point(-90, () => 90 - v.latitude);
-    p.D = Point(90, () => v.latitude - 90);
+    p.C = Point(90, () => v.latitude - 90);
     p.Z = Point(90, () => v.latitude);
     p.T = Point(-90, () => -v.latitude);
 
     p.H = Point(() => v.EH, 0);
-    p.K = distanceAlongArc(p.E, p.D, () => v.EK);
+    p.K = distanceAlongArc(p.E, p.C, () => v.EK);
     p.L = Point(() => -v.EH, 0);
     p.M = distanceAlongArc(p.E, p.A, () => v.EK);
 
@@ -47,6 +48,17 @@ export class Proposition49 extends Model {
     g.equator = new Equator(p.Z);
     g.ZK = new Arc(p.Z, p.K);
     g.TM = new Arc(p.T, p.M);
+
+    g.ABE = new RightAngle(p.B, p.A, p.E);
+    g.LME = new RightAngle(p.M, p.L, p.E);
+    g.HKE = new RightAngle(p.K, p.H, p.E);
+  
+
+    g.HK_label = new ArcLabel(p.H, p.K);
+    g.LM_label = new ArcLabel(p.L, p.M);
+    g.ZD_label = new ArcLabel(p.D, p.Z, { pole: p.E, formatter: northSouthFormatter });
+    g.EK_label = new ArcLabel(p.E, p.K, { pole: p.Z });
+    g.ME_label = new ArcLabel(p.M, p.E, { pole: p.Z });
 
     this.createPointGeometries(p);
   }
@@ -63,8 +75,9 @@ export class Proposition49 extends Model {
   }
 
   setupGui(gui) {
-    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
-    this.declinationSlider = gui.addSlider('Star Declination', this.variables, 'starDeclination', -90, 90);
+    gui.addSlider('Latitude', this.variables, 'latitude', 0, 90, { formatter: northSouthFormatter });
+    this.declinationSlider = gui.addSlider('Star Declination', this.variables, 'starDeclination', 0, 90);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

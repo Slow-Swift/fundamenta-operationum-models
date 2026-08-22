@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -19,6 +19,7 @@ export class Proposition54 extends Model {
     this.variables = {
       radius: 9, 
       aries: 30,
+      showLabels: false,
     };
   }
 
@@ -42,12 +43,19 @@ export class Proposition54 extends Model {
     g.circle = new LatitudeCircle(p.E, () => 90 - v.radius);
     g.ZE = new Arc(p.Z, p.E);
     g.ED = new Arc(p.E, p.D);
-    g.ZH = new Arc(p.B, p.H);
+    g.ZH = new Arc(p.Z, p.H);
+    g.BH = new Arc(p.B, p.H);
     g.EK = new Arc(p.E, p.K);
     g.EG = new Arc(p.G, p.E);
     g.KB = new Arc(p.K, p.B);
     g.KB_p = new Arc(p.K, p.B, {length: 90});
     g.BE = new Arc(p.B, p.E);
+
+    g.EHB = new RightAngle(p.H, p.B, p.E, { maxdst: 3 });
+
+    g.BE_label = new ArcLabel(p.E, p.B);
+    g.BEH = new AngleElement(p.E, p.H, p.B );
+    g.EH = new ArcLabel(p.E, p.H);
 
     this.createPointGeometries(p);
   }
@@ -58,11 +66,14 @@ export class Proposition54 extends Model {
     const g = this.geometry;
     
     this.setGeometryVisibility(v.radius < 90, [g.KB, g.KB_p]);
+
+    this.setGeometryVisibility(v.showLabels, [ g.BE_label, g.BEH, g.EH ]);
   }
 
   setupGui(gui) {
     gui.addSlider('Radius', this.variables, 'radius', 0, 90);
     gui.addSlider('Aries', this.variables, 'aries', 0, 360);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

@@ -5,9 +5,9 @@ import 'katex/dist/katex.min.css';
 import { Theme } from './theme';
 
 export class ModelRenderer {
-  constructor(model, startSize = 1.1, maxZoom=Infinity, minZoom=0) {
+  constructor(model, startSize = 1.1, maxZoom=Infinity, minZoom=0, ctrlsVisible=false) {
     this.creatDomElement();
-    this.gui = new ModelGui();
+    this.gui = new ModelGui(ctrlsVisible);
     this.ortho_size = startSize;
     this.camera = new THREE.OrthographicCamera(-this.ortho_size, this.ortho_size, this.ortho_size, -this.ortho_size);
     this.camera.position.z = 4;

@@ -45,6 +45,7 @@ export class Proposition35 extends Model {
     p.M = Point(90, () => v.DM);
     p.H = distanceAlongArc(p.D, p.O, () => v.DH);
     p.T = Point(-90, () => -v.latitude);
+    p.N = distanceAlongSmallCircle(p.B, p.X, () => -v.ABN, () => 90 - v.BN);
 
     // *** Geometry ***
     g.equator = new Equator(p.Z);
@@ -83,6 +84,8 @@ export class Proposition35 extends Model {
     v.ZH = TriangleSolver.opposite(v.MDO, v.latitude);
     v.DH = v.ZH == 90 ? 90 : TriangleSolver.thirdSide(v.latitude, v.ZH);
     if (v.DM > 180) v.DH = 180 - v.DH;
+    v.ABN = v.DM > 180 ? 180 - v.MDO : v.MDO;
+    v.BN = TriangleSolver.hypoteneusFromAdjacent(v.ABN, 90 - v.latitude);
 
     this.setGeometryVisibility(!(v.meridianDistance == 0 || v.meridianDistance == 180), [g.H, g.ZHO, g.ZH]);
     this.setGeometryVisibility(v.showLabels, [g.AK_label, g.OK_label, g.OM_label, g.DM_label, g.ZM_label, g.ODM]);

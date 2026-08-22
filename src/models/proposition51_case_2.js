@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,6 +20,7 @@ export class Proposition51_Case2 extends Model {
       longitudeB: 130,
       latitudeA: 40,
       latitudeB: 20,
+      showLabels: false,
     };
   }
 
@@ -39,7 +40,8 @@ export class Proposition51_Case2 extends Model {
     p.M = Point(() => v.longitudeB - 90, 0);
     p.N = distanceAlongArc(p.L, p.Z, () => v.latitudeA);
     p.O = distanceAlongArc(p.M, p.Z, () => v.latitudeB);
-    p.Q = distanceAlongArc(p.M, p.Z, () => v.latitudeA);
+    p.Q = distanceAlongArc(p.Z, p.M, () => v.ZQ);
+    p.P = Point(() => (Math.abs(v.longitudeB - v.longitudeA) <= 180) ? (v.longitudeA + v.longitudeB) / 2 - 90 : (v.longitudeA + v.longitudeB) / 2 - 90 + 180, 0);
 
     g.ZL = new Arc(p.Z, p.L);
     g.ZM = new Arc(p.Z, p.M);
@@ -48,20 +50,38 @@ export class Proposition51_Case2 extends Model {
     g.NQ = new Arc(p.N, p.Q);
     g.ON = new Arc(p.O, p.N);
     g.MQ = new Arc(p.M, p.Q);
+
+    g.NLP = new RightAngle(p.L, p.N, p.P);
+    g.OMP = new RightAngle(p.M, p.O, p.P);
+    g.NQZ = new RightAngle(p.Q, p.Z, p.N);
+
+    g.NL_label = new ArcLabel(p.N, p.L);
+    g.OM_label = new ArcLabel(p.O, p.M);
+    g.NZQ = new AngleElement(p.Z, p.L, p.M);
+    g.NQ_label = new ArcLabel(p.N, p.Q);
+    g.NO_label = new ArcLabel(p.N, p.O);
+
     this.createPointGeometries(p);
+    this.setGeometryVisibility(false, [ g.P ]);
   }
  
   updateCalculations() {
     const p = this.points;
     const v = this.variables;
     const g = this.geometry;
+
+    v.ZQ = TriangleSolver.adjacent(Math.abs(v.longitudeB - v.longitudeA), 90 - v.latitudeA);
+    if (Math.abs(v.longitudeB - v.longitudeA) > 90 && Math.abs(v.longitudeB - v.longitudeA) < 270) v.ZQ = 180 - v.ZQ;
+
+    this.setGeometryVisibility(v.showLabels,  [ g.NL_label, g.NZQ, g.OM_label, g.NQ_label, g.NO_label ]);
   }
 
   setupGui(gui) {
     gui.addSlider('Longitude A', this.variables, 'longitudeA', 0, 360);
     gui.addSlider('Longitude B', this.variables, 'longitudeB', 0, 360);
-    gui.addSlider('Latitude A', this.variables, 'latitudeA', -90, 90);
-    gui.addSlider('Latitude B', this.variables, 'latitudeB', -90, 90);
+    gui.addSlider('Latitude A', this.variables, 'latitudeA', -90, 90, { formatter: northSouthFormatter });
+    gui.addSlider('Latitude B', this.variables, 'latitudeB', -90, 90, { formatter: northSouthFormatter });
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, pole, smallCi
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -20,10 +20,12 @@ export class Proposition43 extends Model {
       latitude: 60,
       sunRadius: 10,
       moonRadius: 7,
-      moonLatitude: 10,
+      moonLatitude: 15,
       sunLongitude: 50,
       solarTime: 9,
       obliquity: 23.5,
+      showSun: false,
+      showLabels: false,
     };
   }
 
@@ -67,8 +69,17 @@ export class Proposition43 extends Model {
     g.LGS = new RightAngle(p.G, p.L, p.S);
     g.SHK = new RightAngle(p.H, p.S, p.K);
 
+    g.LS_label = new ArcLabel(p.L, p.S);
+    g.LG_label = new ArcLabel(p.L, p.G);
+    g.LSG = new AngleElement(p.S, p.L, p.G);
+    g.LSZ = new AngleElement(p.S, p.L, p.Z);
+    g.SH = new ArcLabel(p.S, p.H);
+    g.SKH = new AngleElement(p.K, p.S, p.H);
+    g.BK = new ArcLabel(p.B, p.K);
+
     this.createPointGeometries(p);
     this.setGeometryVisibility(false, [g.equator, g.S_e, g.S_p]);
+    this.setGeometryVisibility(false, [g.P, g.X]);
   }
  
   updateCalculations() {
@@ -87,15 +98,21 @@ export class Proposition43 extends Model {
     v.LSZ = v.ZSC - v.LSG;
     v.SK = TriangleSolver.hypoteneusFromAdjacent(v.LSZ, v.SH);
     v.SE = TriangleSolver.hypoteneusFromAdjacent(180-v.ZSC, v.SH);
+
+    this.setGeometryVisibility(v.showSun, [ g.sun, g.moon ]);
+    this.setGeometryVisibility(v.showLabels, [g.BK, g.SKH, g.SH, g.LSZ, g.LS_label, g.LG_label, g.LSG]);
   }
 
   setupGui(gui) {
     gui.addSlider('Latitude', this.variables, 'latitude', 0, 90);
-    gui.addSlider('Solar Time', this.variables, 'solarTime', 0, 12);
-    gui.addSlider('Sun Ecliptic Longitude', this.variables, 'sunLongitude', -180, 180);
+    gui.addSlider('Solar Time', this.variables, 'solarTime', 0, 12, { formatter: (t) => round(t, 1).toString() });
+    gui.addSlider('Sun Ecliptic Longitude', this.variables, 'sunLongitude', 0, 360);
     this.moonLatSlider = gui.addSlider('Moon Ecliptic Latitude', this.variables, 'moonLatitude', 0, 20);
     gui.addSlider('Sun Radius', this.variables, 'sunRadius', 0, 20);
     gui.addSlider('Moon Radius', this.variables, 'moonRadius', 0, 20);
+    gui.addToggle('Show Sun and Moon', this.variables, 'showSun');
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
+    this.updateCalculations();
   }
 
 }

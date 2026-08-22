@@ -2,11 +2,13 @@ import renderMathInElement from "katex/contrib/auto-render/auto-render.js";
 import katex from "katex";
 import { round } from "../math/degMath";
 import { degreeFormatter } from "../geometry/label";
+import slidersIcon from '../assets/sliders.svg';
 
 export class ModelGui {
 
-  constructor() {
+  constructor(ctrlsVisible=false) {
     this.initializeDomElement();
+    this.setCtrlsVisible(ctrlsVisible);
   }
 
   initializeDomElement() {
@@ -27,6 +29,14 @@ export class ModelGui {
     this.sliderArea.classList.add('gui-sliders');
     this.domElement.appendChild(this.sliderArea);
     this.sliders = [];
+
+    this.ctrlsBtn = document.createElement('div');
+    this.ctrlsBtn.classList.add('gui-ctrlbtn');
+    this.domElement.appendChild(this.ctrlsBtn);
+    this.ctrlsBtn.onclick = () => this.sliderArea.classList.toggle('gui-hidden');
+    this.ctrlIcon = document.createElement('span');
+    this.ctrlIcon.classList.add('gui-slider-icon');
+    this.ctrlsBtn.appendChild(this.ctrlIcon);
   }
 
   setupPageControls(options, selected, onselected, darkTheme, onThemeChange) {
@@ -96,6 +106,14 @@ export class ModelGui {
 
     this.sliders.length=0;
   }
+
+  setCtrlsVisible(visible) {
+    if (visible) {
+      this.sliderArea.classList.remove('gui-hidden');
+    } else {
+      this.sliderArea.classList.add('gui-hidden');
+    }
+}
 
   addArrows(leftCallback, rightCallback) {
     this.leftArrow = document.createElement('div');

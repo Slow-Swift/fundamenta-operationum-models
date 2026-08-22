@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -19,7 +19,8 @@ export class Proposition57 extends Model {
     this.variables = {
       dayLength: 15, 
       longitude: 40,
-      obliquity: 23.5
+      obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -48,6 +49,17 @@ export class Proposition57 extends Model {
     g.HN = new Arc(p.H, p.N);
     g.LNH = new RightAngle(p.N, p.L, p.H);
 
+    g.ABE = new RightAngle(p.B, p.A, p.E);
+    g.LME = new RightAngle(p.M, p.L, p.E);
+    g.HKE = new RightAngle(p.K, p.H, p.E);
+    g.AZL = new RightAngle(p.A, p.Z, p.L);
+
+    g.HL_label = new ArcLabel(p.L, p.H);
+    g.MK_label = new ArcLabel(p.M, p.K);
+    g.ZA_label = new ArcLabel(p.Z, p.A);
+    g.ZL_label = new ArcLabel(p.Z, p.L);
+    g.ZH_label = new ArcLabel(p.Z, p.H);
+
     this.createPointGeometries(p);
   }
  
@@ -61,10 +73,13 @@ export class Proposition57 extends Model {
     v.EL = proposition3(90 - v.ZL, v.obliquity);
     v.ZLA = TriangleSolver.angleFromOppositeAndHypotenuse(90 - v.obliquity, v.ZL);
     v.LN = TriangleSolver.adjacent(v.ZLA, v.EL - v.longitude);
+
+    this.setGeometryVisibility(v.showLabels, [ g.HL_label, g.MK_label, g.ZA_label, g.ZL_label, g.ZH_label]);
   }
 
   setupGui(gui) {
     gui.addSlider('H Longitude', this.variables, 'longitude', 0, 90);
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }

@@ -2,7 +2,7 @@ import { angle, distanceAlongArc, distanceAlongSmallCircle, Point, smallCircleAr
 import { sin, cos, tan, asin, acos, atan, round, mod } from "../math/degMath";
 import { Equator } from "../geometry/great_circle";
 import { Model } from "../core/model";
-import { Label } from "../geometry/label";
+import { ArcLabel, Label, northSouthFormatter } from "../geometry/label";
 import { Arc } from "../geometry/arc";
 import { SphereElement } from "../geometry/sphere_element";
 import { Vector3 } from "three";
@@ -19,6 +19,7 @@ export class Proposition44 extends Model {
       starLongitude: 150,
       starLatitude: 20,
       obliquity: 23.5,
+      showLabels: false,
     };
   }
 
@@ -44,6 +45,7 @@ export class Proposition44 extends Model {
     p.N = distanceAlongArc(p.X, p.H, () => v.XN);
     p.L = Point(() => -90 + v.BL, 0);
     p.M = Point(() => -90 + v.BL + v.LM, 0);
+    p.M_p = Point(() => v.BL + v.LM, 0);
     p.K = Point(() => -v.EM, () => v.MK);
 
     // *** Geometry ***
@@ -60,7 +62,15 @@ export class Proposition44 extends Model {
     g.KME = new RightAngle(p.M, p.K, p.E);
     g.ABE = new RightAngle(p.B, p.A, p.E);
 
+    g.ZX_label = new ArcLabel(p.Z, p.X);
+    g.ZXN = new AngleElement(p.X, p.Z, p.N);
+    g.HLM = new AngleElement(p.L, p.H, p.M);
+    g.HL_label = new ArcLabel(p.H, p.L);
+    g.OH_label = new ArcLabel(p.O, p.H);
+    g.OM_label = new ArcLabel(p.O, p.M, { pole: p.M_p, formatter: northSouthFormatter });
+
     this.createPointGeometries(p);
+    this.setGeometryVisibility(false, [ g.M_p ]);
   }
  
   updateCalculations() {
@@ -82,12 +92,16 @@ export class Proposition44 extends Model {
     v.EK = TriangleSolver.hypoteneusFromAdjacent(v.obliquity, v.EM);
     v.MK = TriangleSolver.opposite(v.obliquity, v.EK);
 
-    this.setGeometryVisibility(v.ZN > 0 && v.ZN < 180, [g.ZM, g.OM, g.MK, g.M, g.K]);
+    this.setGeometryVisibility(p.O().dot(p.Z) != 0, [g.ZM, g.OM, g.MK, g.M, g.K]);
+    this.setGeometryVisibility(v.showLabels, [ g.OH_label, g.HL_label, g.HLM, g.ZX_label, g.ZXN]);
+    this.setGeometryVisibility(v.showLabels && p.O().dot(p.Z) != 0, [ g.OM_label ]);
+    this.setGeometryVisibility(v.showLabels && v.starLongitude < 360, [ g.HLM ]);
   }
 
   setupGui(gui) {
     gui.addSlider('Star Longitude', this.variables, 'starLongitude', 0, 360);
-    gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90);
+    gui.addSlider('Star Latitude', this.variables, 'starLatitude', -90, 90, { formatter: northSouthFormatter });
+    gui.addToggle('Show Labels', this.variables, 'showLabels');
   }
 
 }
